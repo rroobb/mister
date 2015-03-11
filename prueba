@@ -1,0 +1,54 @@
+ENTERO numero = 15;
+
+CLASE PERSONA HEREDA HUMANO {
+	ATRIBUTOS:
+		PUBLICO ENTERO numero;
+		PRIVADO DECIMAL numero2;
+	METODOS:
+		FUNCION NADA PRINT(ENTERO asdalsd){
+		}
+};
+
+CLASE PERSONA {
+	ATRIBUTOS:
+		PUBLICO ENTERO numero;
+		PRIVADO DECIMAL numero2;
+	METODOS:
+		FUNCION ENTERO PRINT(){
+
+		RETORNAR -5/16;
+		}
+};
+
+DECIMAL HOLA ;
+
+FUNCION DECIMAL AREA( DECIMAL base, DECIMAL altura){
+	
+}
+
+
+FUNCION ENTERO INICIO (ENTERO parametro1 , DECIMAL parametro2) {
+	LISTA TEXTO 3 milista = ["HOLA", "COMO", "ESTAS"];
+	ENTERO num1, num2, num3 = (4*5+num2) && 4==4 || 3!=4;
+	TEXTO string="hola", string="como";
+
+	SI(5>(4/5+num2) && -4==+4 || "hola"!="como"){
+		persona.print(&rob, num.nombre());
+		ASIGNAR persona.nombre = persona.edad; 
+	}
+	SINO{
+		MIENTRAS (x > y){
+		ASIGNAR	x = x + 1;
+		}
+	}
+
+	SI(5>(4/5+num2) && 4==4 || "hola"!="como"){
+		persona.print();
+	}
+
+	IMPRIMIR("hola","como", 5+4, num2);
+	LEER(milista);
+
+
+
+}
