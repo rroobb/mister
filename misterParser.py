@@ -243,8 +243,6 @@ class misterParser ( Parser ):
 
     contDecimal = 0
 
-    contClases = 0
-
     contLista = 0
 
     contTexto = 0
@@ -485,21 +483,24 @@ class misterParser ( Parser ):
 
     def insertarVariable(self):
         direccion = None
-        if self.AuxTipoVar == "ENTERO":
-            direccion = self.contEnteros
-            self.contEnteros = self.contEnteros + 1
-        elif self.AuxTipoVar == "DECIMAL":
-            direccion = self.contDecimal
-            self.contDecimal = self.contDecimal + 1
-        elif self.AuxTipoVar == "TEXTO":
-            direccion = self.contTexto
-            self.contTexto = self.contTexto + 1
-        elif self.AuxTipoVar == "LISTA":
-            direccion = self.contLista
-            self.contLista = self.contLista + 1
-        else:
-            direccion = self.contClases
-            self.contClases = self.contClases + 1
+        isClase = False
+        dicAtributos = {}
+        if (self.claseActual == None) or (self.claseActual != None and self.funcionActual != None) :
+            if self.AuxTipoVar == "ENTERO":
+                direccion = self.contEnteros
+                self.contEnteros = self.contEnteros + 1
+            elif self.AuxTipoVar == "DECIMAL":
+                direccion = self.contDecimal
+                self.contDecimal = self.contDecimal + 1
+            elif self.AuxTipoVar == "TEXTO":
+                direccion = self.contTexto
+                self.contTexto = self.contTexto + 1
+            elif self.AuxTipoVar == "LISTA":
+                direccion = self.contLista
+                self.contLista = self.contLista + 1
+            else:
+                isClase = True
+                
 
         tipo = None
         if self.AuxTipoLista == None and self.AuxTipoVar != "LISTA":
@@ -507,16 +508,40 @@ class misterParser ( Parser ):
         else:
             tipo = self.AuxTipoVar + "," + self.AuxTipoLista
 
+        if isClase:
+            NombrePadre = self.AuxTipoVar
+            direccionAux = None
+            while True:
+                dictAux = self.dirPrincipal[NombrePadre][3]
+                for key in dictAux.keys():
+
+                    if dictAux[key][0] == "ENTERO":
+                        direccionAux = self.contEnteros
+                        self.contEnteros = self.contEnteros + 1
+                    elif dictAux[key][0] == "DECIMAL":
+                        direccionAux = self.contDecimal
+                        self.contDecimal = self.contDecimal + 1
+                    elif dictAux[key][0] == "TEXTO":
+                        direccionAux = self.contTexto
+                        self.contTexto = self.contTexto + 1
+                    else:
+                        direccionAux = self.contLista
+                        self.contLista = self.contLista + 1
+                    dicAtributos[key] = [dictAux[key][0], dictAux[key][1], direccionAux]
+                NombrePadre = self.dirPrincipal[NombrePadre][2]
+                if NombrePadre == None:
+                    break
+
         if self.claseActual == None:
             if self.funcionActual == None:
-                self.dirPrincipal['global'][3][self.variableActual] = [tipo, direccion]
+                self.dirPrincipal['global'][3][self.variableActual] = [tipo, direccion, dicAtributos]
             else:
-                self.dirPrincipal[self.funcionActual][3][self.variableActual] = [tipo, direccion]
+                self.dirPrincipal[self.funcionActual][3][self.variableActual] = [tipo, direccion, dicAtributos]
         else:
             if self.funcionActual == None:
-                self.dirPrincipal[self.claseActual][3][self.variableActual] = [tipo, self.AuxVisVar, direccion]
+                self.dirPrincipal[self.claseActual][3][self.variableActual] = [tipo, self.AuxVisVar, direccion, dicAtributos]
             else:
-                self.dirPrincipal[self.claseActual][1][self.funcionActual][1][self.variableActual] = [tipo, self.AuxVisVar, direccion]
+                self.dirPrincipal[self.claseActual][1][self.funcionActual][1][self.variableActual] = [tipo, self.AuxVisVar, direccion, dicAtributos]
         self.variableActual = None
 
 
