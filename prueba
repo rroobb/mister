@@ -24,26 +24,31 @@ CLASE GORDA HEREDA PERSONA {
 		PRIVADO DECIMAL numero6;
 	METODOS:
 		FUNCION ENTERO PRINT(){
-
+		GORDA aux, numero10;
+		ASIGNAR numero10 = aux;
 		RETORNAR -5/16;
 		}
 };
 
-GORDA marialicia;
+GORDA marialicia, x, y;
 PERSONA rob;
 HUMANO polo;
 
 
 
 FUNCION DECIMAL AREA( DECIMAL base, DECIMAL altura){
+	ASIGNAR rob = polo;
+}
+
+FUNCION DECIMAL AREA2( DECIMAL base, DECIMAL altura){
 	
 }
 
-
 FUNCION ENTERO INICIO (ENTERO parametro1 , DECIMAL parametro2) {
+	ENTERO persona, num;
 	LISTA TEXTO 3 milista = ["HOLA", "COMO", "ESTAS"];
 	ENTERO num1, num2, num3 = (4*5+num2) && 4==4 || 3!=4;
-	TEXTO string="hola", string="como";
+	TEXTO string="hola", string2="como";
 
 	SI(5>(4/5+num2) && -4==+4 || "hola"!="como"){
 		persona.print(&rob, num.nombre());

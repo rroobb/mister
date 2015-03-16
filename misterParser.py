@@ -1,5 +1,6 @@
 # Generated from java-escape by ANTLR 4.5
 # encoding: utf-8
+import sys
 from antlr4 import *
 from io import StringIO
 package = globals().get("__package__", None)
@@ -263,7 +264,11 @@ class misterParser ( Parser ):
 
     AuxPadre = None
 
+    AuxLongLista = None
+
     dirPrincipal = {'global':[None, None, None, {}]}
+
+    semanticaCompuestoAux = None
 
     atn = ATNDeserializer().deserialize(serializedATN())
 
@@ -471,6 +476,10 @@ class misterParser ( Parser ):
 
     def insertarFunc(self):
         self.funcionActual = self.getCurrentToken().text
+        if self.dirPrincipal.get(self.funcionActual) != None:
+            print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Funcion ya existente" )
+            self._syntaxErrors = self._syntaxErrors + 1
+            return
         if self.claseActual == None:
             self.dirPrincipal[self.funcionActual] = [self.AuxTipo, None, None, {}]
         else:
@@ -478,6 +487,10 @@ class misterParser ( Parser ):
         self.AuxTipo = None
 
     def insertarClase(self):
+        if self.dirPrincipal.get(self.claseActual) != None:
+            print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Clase ya existente" )
+            self._syntaxErrors = self._syntaxErrors + 1
+            return
         self.dirPrincipal[self.claseActual] = [None, {}, self.AuxPadre, {} ]
         self.AuxPadre = None
 
@@ -534,16 +547,52 @@ class misterParser ( Parser ):
 
         if self.claseActual == None:
             if self.funcionActual == None:
+                if self.dirPrincipal['global'][3].get(self.variableActual) != None:
+                    print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Variable ya existente" )
+                    self._syntaxErrors = self._syntaxErrors + 1
+                    return
                 self.dirPrincipal['global'][3][self.variableActual] = [tipo, direccion, dicAtributos]
             else:
+                if self.dirPrincipal[self.funcionActual][3].get(self.variableActual) != None:
+                    print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Variable ya existente" )
+                    self._syntaxErrors = self._syntaxErrors + 1
+                    return
                 self.dirPrincipal[self.funcionActual][3][self.variableActual] = [tipo, direccion, dicAtributos]
         else:
             if self.funcionActual == None:
+                if self.dirPrincipal[self.claseActual][3].get(self.variableActual) != None:
+                    print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Variable ya existente" )
+                    self._syntaxErrors = self._syntaxErrors + 1
+                    return
                 self.dirPrincipal[self.claseActual][3][self.variableActual] = [tipo, self.AuxVisVar, direccion, dicAtributos]
             else:
+                if self.dirPrincipal[self.claseActual][1][self.funcionActual][1].get(self.variableActual) != None:
+                    print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Variable ya existente" )
+                    self._syntaxErrors = self._syntaxErrors + 1
+                    return
                 self.dirPrincipal[self.claseActual][1][self.funcionActual][1][self.variableActual] = [tipo, self.AuxVisVar, direccion, dicAtributos]
         self.variableActual = None
 
+    def checarId(self, variableId):
+        if self.claseActual == None:
+            if self.funcionActual == None:
+                if self.dirPrincipal['global'][3].get(variableId) == None:
+                    print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + "Variable no declarada" )
+                    self._syntaxErrors = self._syntaxErrors + 1
+                    return
+            else:
+                if self.dirPrincipal[self.funcionActual][3].get(variableId) == None:
+                    if self.dirPrincipal['global'][3].get(variableId) == None:
+                        print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + "Variable no declarada" )
+                        self._syntaxErrors = self._syntaxErrors + 1
+                        return
+        else:
+            if self.funcionActual != None:
+                if self.dirPrincipal[self.claseActual][1][self.funcionActual][1].get(variableId) == None:
+                    if self.dirPrincipal[self.claseActual][3].get(variableId) == None:
+                        print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + "Variable no declarada" )
+                        self._syntaxErrors = self._syntaxErrors + 1
+                        return
 
     def programa(self):
 
@@ -629,6 +678,7 @@ class misterParser ( Parser ):
             localctx.exception = re
             self._errHandler.reportError(self, re)
             self._errHandler.recover(self, re)
+
         finally:
             self.exitRule()
         return localctx
@@ -3316,7 +3366,9 @@ class misterParser ( Parser ):
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 396
+            self.semanticaCompuestoAux = self.getCurrentToken().text
             self.match(misterParser.ID)
+            self.checarId(self.semanticaCompuestoAux)
             self.state = 397
             self.compuestoAux1()
         except RecognitionException as re:
