@@ -270,6 +270,8 @@ class misterParser ( Parser ):
 
     semanticaCompuestoAux = None
 
+    semanticaCompuestoAux2 = None
+
     atn = ATNDeserializer().deserialize(serializedATN())
 
     decisionsToDFA = [ DFA(ds, i) for i, ds in enumerate(atn.decisionToState) ]
@@ -577,22 +579,115 @@ class misterParser ( Parser ):
         if self.claseActual == None:
             if self.funcionActual == None:
                 if self.dirPrincipal['global'][3].get(variableId) == None:
-                    print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + "Variable no declarada" )
+                    print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Variable no declarada" )
                     self._syntaxErrors = self._syntaxErrors + 1
                     return
             else:
                 if self.dirPrincipal[self.funcionActual][3].get(variableId) == None:
                     if self.dirPrincipal['global'][3].get(variableId) == None:
-                        print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + "Variable no declarada" )
+                        print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Variable no declarada" )
                         self._syntaxErrors = self._syntaxErrors + 1
                         return
         else:
             if self.funcionActual != None:
                 if self.dirPrincipal[self.claseActual][1][self.funcionActual][1].get(variableId) == None:
                     if self.dirPrincipal[self.claseActual][3].get(variableId) == None:
-                        print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + "Variable no declarada" )
+                        print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Variable no declarada" )
                         self._syntaxErrors = self._syntaxErrors + 1
                         return
+
+    def checarAtributo(self, atributoId):
+        varAtributos = None
+        if self.claseActual == None:
+            if self.funcionActual == None:
+                varAtributos = self.dirPrincipal['global'][3][self.semanticaCompuestoAux][2].get(atributoId)
+                if varAtributos != None:
+                    if varAtributos[1] == 'PRIVADO':
+                        print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " No se puede acceder al atributo privado" )
+                        self._syntaxErrors = self._syntaxErrors + 1
+                        return
+                else:
+                    print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Atributo no declarado" )
+                    self._syntaxErrors = self._syntaxErrors + 1
+                    return
+
+            else:
+                varAtributos = self.dirPrincipal[self.funcionActual][3][self.semanticaCompuestoAux][2].get(atributoId)
+                if varAtributos != None:
+                    if varAtributos[1] == 'PRIVADO':
+                        print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " No se puede acceder al atributo privado" )
+                        self._syntaxErrors = self._syntaxErrors + 1
+                        return
+                
+                else:
+                    print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Atributo no declarado" )
+                    self._syntaxErrors = self._syntaxErrors + 1
+                    return
+
+        else:
+            if self.funcionActual != None:
+                varAtributos = self.dirPrincipal[self.claseActual][1][self.funcionActual][1][self.semanticaCompuestoAux][3].get(atributoId)
+                if varAtributos != None:
+                    if varAtributos[1] == 'PRIVADO':
+                        print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " No se puede acceder al atributo privado" )
+                        self._syntaxErrors = self._syntaxErrors + 1
+                        return
+                else:
+                    print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Atributo no declarado" )
+                    self._syntaxErrors = self._syntaxErrors + 1
+                    return
+
+    def checarMetodo(self):
+        if self.semanticaCompuestoAux2 == None:
+            if self.claseActual == None:
+                if self.dirPrincipal.get(self.semanticaCompuestoAux) == None:
+                    print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Funcion no declarada" )
+                    self._syntaxErrors = self._syntaxErrors + 1
+                    return
+            else:
+                self.encontrarFuncionClase(self.claseActual)
+
+        else:
+            tipo = None
+            if self.claseActual == None:
+                if self.funcionActual == None:
+                    tipo = self.dirPrincipal['global'][3][self.semanticaCompuestoAux][0]
+                    
+                else:
+                    tipo = self.dirPrincipal[self.funcionActual][3][self.semanticaCompuestoAux][0]
+            
+            else:
+                if self.funcionActual == None:
+                    tipo = self.dirPrincipal[self.claseActual][3][self.semanticaCompuestoAux][0]
+
+                else:
+                    tipo = self.dirPrincipal[self.claseActual][1][self.funcionActual][1][self.semanticaCompuestoAux][0]
+                    
+            self.encontrarFuncionClase(tipo)
+
+    def encontrarFuncionClase(self, padre):
+        if padre in ['ENTERO','DECIMAL','TEXTO','NADA', 'LISTA']:
+            print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Variable no compuesta" )
+            self._syntaxErrors = self._syntaxErrors + 1
+            return
+        
+        while True:
+            dictAux = self.dirPrincipal[padre][1]
+            for key in dictAux.keys():
+                if self.semanticaCompuestoAux2 == key:
+                    return
+            padre = self.dirPrincipal[padre][2]
+            if padre == None:
+                break
+        print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Funcion no declarada" )
+        self._syntaxErrors = self._syntaxErrors + 1
+        return
+
+    def checarClase(self):
+        if self.dirPrincipal.get(self.AuxTipoVar) == None:
+            print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Clase no declarada" )
+            self._syntaxErrors = self._syntaxErrors + 1
+            return
 
     def programa(self):
 
@@ -1075,6 +1170,7 @@ class misterParser ( Parser ):
                 self.enterOuterAlt(localctx, 1)
                 self.state = 184
                 self.match(misterParser.ID)
+                self.checarClase()
 
             elif token in [misterParser.ENTERO, misterParser.DECIMAL, misterParser.TEXTO]:
                 self.enterOuterAlt(localctx, 2)
@@ -1760,6 +1856,8 @@ class misterParser ( Parser ):
                 self.compuesto()
                 self.state = 241
                 self.valorAux1()
+                semanticaCompuestoAux = None
+                semanticaCompuestoAux2 = None
 
             elif token in [misterParser.CTETEXTO]:
                 self.enterOuterAlt(localctx, 4)
@@ -1811,13 +1909,22 @@ class misterParser ( Parser ):
             if token in [misterParser.PARENTESIS1]:
                 self.enterOuterAlt(localctx, 1)
                 self.state = 246
+                self.checarMetodo()
                 self.llamarFunc()
 
             elif token in [misterParser.Y, misterParser.O, misterParser.IDENTICO, misterParser.COMA, misterParser.SUMA, misterParser.RESTA, misterParser.DIVISION, misterParser.MULTIPLICACION, misterParser.DIFERENTE, misterParser.MAYORIGUAL, misterParser.MENORIGUAL, misterParser.MENOR, misterParser.MAYOR, misterParser.PARENTESIS2, misterParser.CORCHETE2, misterParser.PUNTOYCOMA]:
+                if self.semanticaCompuestoAux2 == None:
+                    self.checarId(self.semanticaCompuestoAux)
+                else:
+                    self.checarAtributo(self.semanticaCompuestoAux2)
                 self.enterOuterAlt(localctx, 2)
 
 
             else:
+                if self.semanticaCompuestoAux2 == None:
+                    self.checarId(self.semanticaCompuestoAux)
+                else:
+                    self.checarAtributo(self.semanticaCompuestoAux2)
                 raise NoViableAltException(self)
 
         except RecognitionException as re:
@@ -3368,7 +3475,7 @@ class misterParser ( Parser ):
             self.state = 396
             self.semanticaCompuestoAux = self.getCurrentToken().text
             self.match(misterParser.ID)
-            self.checarId(self.semanticaCompuestoAux)
+            #self.checarId(self.semanticaCompuestoAux)
             self.state = 397
             self.compuestoAux1()
         except RecognitionException as re:
@@ -3417,9 +3524,11 @@ class misterParser ( Parser ):
                 self.state = 399
                 self.match(misterParser.PUNTO)
                 self.state = 400
+                self.semanticaCompuestoAux2 = self.getCurrentToken().text
                 self.match(misterParser.ID)
 
             elif token in [misterParser.Y, misterParser.O, misterParser.IDENTICO, misterParser.IGUAL, misterParser.COMA, misterParser.SUMA, misterParser.RESTA, misterParser.DIVISION, misterParser.MULTIPLICACION, misterParser.DIFERENTE, misterParser.MAYORIGUAL, misterParser.MENORIGUAL, misterParser.MENOR, misterParser.MAYOR, misterParser.PARENTESIS1, misterParser.PARENTESIS2, misterParser.CORCHETE2, misterParser.PUNTOYCOMA]:
+                self.semanticaCompuestoAux2 = None
                 self.enterOuterAlt(localctx, 2)
 
 
@@ -3481,6 +3590,10 @@ class misterParser ( Parser ):
             self.match(misterParser.ASIGNAR)
             self.state = 405
             self.compuesto()
+            if self.semanticaCompuestoAux2 == None:
+                self.checarId(self.semanticaCompuestoAux)
+            else:
+                self.checarAtributo(self.semanticaCompuestoAux2)
             self.state = 406
             self.match(misterParser.IGUAL)
             self.state = 407

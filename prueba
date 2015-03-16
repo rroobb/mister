@@ -1,12 +1,17 @@
 ENTERO numero = 15;
+ENTERO hola;
 
 CLASE HUMANO {
 	ATRIBUTOS:
 		PUBLICO ENTERO numero1;
 		PRIVADO DECIMAL numero2;
+		PUBLICO ENTERO nombre;
+		PRIVADO ENTERO edad;
 	METODOS:
-		FUNCION NADA PRINT(ENTERO asdalsd){
+		FUNCION NADA print(ENTERO asdalsd){
 		}
+		
+		FUNCION NADA print2(ENTERO X) {}
 };
 
 CLASE PERSONA HEREDA HUMANO {
@@ -14,7 +19,9 @@ CLASE PERSONA HEREDA HUMANO {
 		PUBLICO ENTERO numero3;
 		PRIVADO DECIMAL numero4;
 	METODOS:
-		FUNCION NADA PRINT(ENTERO asdalsd){
+		FUNCION NADA print(ENTERO asdalsd){
+			ENTERO hola;
+			ASIGNAR hola = "hola";
 		}
 };
 
@@ -23,7 +30,7 @@ CLASE GORDA HEREDA PERSONA {
 		PUBLICO ENTERO numero5;
 		PRIVADO DECIMAL numero6;
 	METODOS:
-		FUNCION ENTERO PRINT(){
+		FUNCION ENTERO print(){
 		GORDA aux, numero10;
 		ASIGNAR numero10 = aux;
 		RETORNAR -5/16;
@@ -34,24 +41,25 @@ GORDA marialicia, x, y;
 PERSONA rob;
 HUMANO polo;
 
-
+FUNCION DECIMAL perimetro(){}
 
 FUNCION DECIMAL AREA( DECIMAL base, DECIMAL altura){
 	ASIGNAR rob = polo;
 }
 
 FUNCION DECIMAL AREA2( DECIMAL base, DECIMAL altura){
-	
+
 }
 
 FUNCION ENTERO INICIO (ENTERO parametro1 , DECIMAL parametro2) {
-	ENTERO persona, num;
+	PERSONA persona;
+	ENTERO num;
 	LISTA TEXTO 3 milista = ["HOLA", "COMO", "ESTAS"];
 	ENTERO num1, num2, num3 = (4*5+num2) && 4==4 || 3!=4;
 	TEXTO string="hola", string2="como";
 
 	SI(5>(4/5+num2) && -4==+4 || "hola"!="como"){
-		persona.print(&rob, num.nombre());
+		persona.print(&rob, num.nombre);
 		ASIGNAR persona.nombre = persona.edad; 
 	}
 	SINO{
@@ -62,11 +70,16 @@ FUNCION ENTERO INICIO (ENTERO parametro1 , DECIMAL parametro2) {
 
 	SI(5>(4/5+num2) && 4==4 || "hola"!="como"){
 		persona.print();
+		persona.print2();
+		persona.print3();
+		perimetro();
 	}
 
 	IMPRIMIR("hola","como", 5+4, num2);
 	LEER(milista);
-
+	SI(persona.numero3 > 8) {
+		ASIGNAR y = 10;
+	}
 
 
 }
