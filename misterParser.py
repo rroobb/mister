@@ -293,6 +293,8 @@ class misterParser ( Parser ):
 
     quadList = []
 
+    quadOperadores = [['*','/'],['+','-'],['=','!=','>','>=','<','<='],['&&','||']]
+
     atn = ATNDeserializer().deserialize(serializedATN())
 
     decisionsToDFA = [ DFA(ds, i) for i, ds in enumerate(atn.decisionToState) ]
@@ -716,7 +718,7 @@ class misterParser ( Parser ):
         return
 
     def obtenerTipo(self, stringVariable):
-        if stringVariable == None || self._syntaxErrors > 0:
+        if stringVariable == None or self._syntaxErrors > 0:
             return None
         listaAux = stringVariable.split(".")
         if len(listaAux) == 1:
@@ -793,21 +795,23 @@ class misterParser ( Parser ):
         self.pOper.append(op)
 
     def crearCuadruplo(self,op):
-        oper = self.pOper.pop()
-        if oper == op:
-            oDer = self.pilaO.pop()
-            oIzq = self.pilaO.pop()
-            res = self.cuboSem.checarSemanticaExp(oIzq,oDer,oper)
-            if res != None:
-                self.quadList.append([oper,oIzq,oDer,"t" + self.contQuadTemporales])
-                self.insertarValorTipo("t" + self.contQuadTemporales,res)
-                self.contQuadTemporales = self.contQuadTemporales + 1
+        #OP = 0 - mult,div 1 - suma,resta 2 - relacionales 3 - logicos
+        if self.pOper:
+            oper = self.pOper.pop()
+            if oper in self.quadOperadores[op]:
+                oDer = self.pilaO.pop()
+                oIzq = self.pilaO.pop()
+                res = self.cuboSem.checarSemanticaExp(oIzq,oDer,oper)
+                if res != None:
+                    self.quadList.append([oper,oIzq,oDer,"t" + self.contQuadTemporales])
+                    self.insertarValorTipo("t" + self.contQuadTemporales,res)
+                    self.contQuadTemporales = self.contQuadTemporales + 1
+                else:
+                    print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Tipos de operandos no compatibles" )
+                    self._syntaxErrors = self._syntaxErrors + 1
+                    return
             else:
-                print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Tipos de operadores no compatibles" )
-                self._syntaxErrors = self._syntaxErrors + 1
-                return
-        else:
-            self.pOper.append(oper)
+                self.pOper.append(oper)
 
     def programa(self):
 
@@ -816,7 +820,6 @@ class misterParser ( Parser ):
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 142
-            auxiliar = cuboSemantico()
             self.programaAux1()
             self.state = 143
             self.programaAux3()
@@ -2652,9 +2655,12 @@ class misterParser ( Parser ):
             if token in [misterParser.Y, misterParser.O]:
                 self.enterOuterAlt(localctx, 1)
                 self.state = 302
+                self.operador = self.getCurrentToken().text
                 self.expresionAux2()
+                self.insertarOperador(self.operador)
                 self.state = 303
                 self.expresion()
+                self.crearCuadruplo(3)
 
             elif token in [misterParser.COMA, misterParser.PARENTESIS2, misterParser.PUNTOYCOMA]:
                 self.enterOuterAlt(localctx, 2)
@@ -2958,9 +2964,12 @@ class misterParser ( Parser ):
             if token in [misterParser.IDENTICO, misterParser.DIFERENTE, misterParser.MAYORIGUAL, misterParser.MENORIGUAL, misterParser.MENOR, misterParser.MAYOR]:
                 self.enterOuterAlt(localctx, 1)
                 self.state = 325
+                self.operador = self.getCurrentToken().text
                 self.declaracionAux1()
+                self.insertarOperador(self.operador)
                 self.state = 326
                 self.exp()
+                self.crearCuadruplo(2)
 
             elif token in [misterParser.Y, misterParser.O, misterParser.COMA, misterParser.PARENTESIS2, misterParser.PUNTOYCOMA]:
                 self.enterOuterAlt(localctx, 2)
@@ -3013,6 +3022,7 @@ class misterParser ( Parser ):
             self.enterOuterAlt(localctx, 1)
             self.state = 331
             self.termino()
+            self.crearCuadruplo(1)
             self.state = 332
             self.expAux1()
         except RecognitionException as re:
@@ -3068,6 +3078,7 @@ class misterParser ( Parser ):
                 self.enterOuterAlt(localctx, 1)
                 self.state = 334
                 self.match(misterParser.SUMA)
+                self.insertarOperador('+')
                 self.state = 335
                 self.termino()
                 self.state = 336
@@ -3077,6 +3088,7 @@ class misterParser ( Parser ):
                 self.enterOuterAlt(localctx, 2)
                 self.state = 338
                 self.match(misterParser.RESTA)
+                self.insertarOperador('-')
                 self.state = 339
                 self.termino()
                 self.state = 340
@@ -3378,7 +3390,7 @@ class misterParser ( Parser ):
             self.enterOuterAlt(localctx, 1)
             self.state = 370
             self.factor()
-            
+            self.crearCuadruplo(0)
             self.state = 371
             self.terminoAux1()
         except RecognitionException as re:
@@ -3434,6 +3446,7 @@ class misterParser ( Parser ):
                 self.enterOuterAlt(localctx, 1)
                 self.state = 373
                 self.match(misterParser.MULTIPLICACION)
+                self.insertarOperador('*')
                 self.state = 374
                 self.factor()
                 self.state = 375
@@ -3443,6 +3456,7 @@ class misterParser ( Parser ):
                 self.enterOuterAlt(localctx, 2)
                 self.state = 377
                 self.match(misterParser.DIVISION)
+                self.insertarOperador('/')
                 self.state = 378
                 self.factor()
                 self.state = 379
@@ -3512,10 +3526,12 @@ class misterParser ( Parser ):
                 self.enterOuterAlt(localctx, 1)
                 self.state = 384
                 self.match(misterParser.PARENTESIS1)
+                self.insertarOperador('(')
                 self.state = 385
                 self.expresion()
                 self.state = 386
                 self.match(misterParser.PARENTESIS2)
+                self.pOper.pop()
 
             elif token in [misterParser.ID, misterParser.CTENTERO, misterParser.CTEDECIMAL, misterParser.CTETEXTO]:
                 self.enterOuterAlt(localctx, 2)

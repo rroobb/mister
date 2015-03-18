@@ -9,6 +9,6 @@ def main(argv):
     stream = CommonTokenStream(lexer)
     parser = misterParser(stream)
     tree = parser.programa()
-    print(parser._syntaxErrors)
+    print(parser.quadList)
 if __name__ == '__main__':
     main(sys.argv)
