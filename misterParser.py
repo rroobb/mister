@@ -676,9 +676,9 @@ class misterParser ( Parser ):
         
         while True:
             dictAux = self.dirPrincipal[padre][1]
-            for key in dictAux.keys():
-                if self.semanticaCompuestoAux2 == key:
-                    return
+            value = dictAux.get(self.semanticaCompuestoAux2)
+            if  value != None:
+                return
             padre = self.dirPrincipal[padre][2]
             if padre == None:
                 break
@@ -689,9 +689,9 @@ class misterParser ( Parser ):
     def encontrarTipoFuncionClase(self, padre, funcion):
         while True:
             dictAux = self.dirPrincipal[padre][1]
-            for key in dictAux.keys():
-                if funcion == key:
-                    return dictAux[key][0]
+            value = dictAux.get(funcion)
+            if value != None:
+                return value[0]
             padre = self.dirPrincipal[padre][2]
             if padre == None:
                 break
