@@ -698,7 +698,7 @@ class misterParser ( Parser ):
         return
 
     def obtenerTipo(self, stringVariable):
-        if stringVariable == None || self._syntaxErrors > 0:
+        if stringVariable == None or self._syntaxErrors > 0:
             return None
         listaAux = stringVariable.split(".")
         if len(listaAux) == 1:
