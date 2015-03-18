@@ -263,8 +263,6 @@ class misterParser ( Parser ):
 
     variableActual = None
 
-    stackParametros = []
-
     contAuxParametroActual = None
 
     AuxPadre = None
@@ -706,16 +704,52 @@ class misterParser ( Parser ):
         self._syntaxErrors = self._syntaxErrors + 1
         return
 
-    def encontrarTipoFuncionClase(self, padre):
+    def encontrarTipoFuncionClase(self, padre, funcion):
         while True:
             dictAux = self.dirPrincipal[padre][1]
             for key in dictAux.keys():
-                if self.semanticaCompuestoAux2 == key:
+                if funcion == key:
                     return dictAux[key][0]
             padre = self.dirPrincipal[padre][2]
             if padre == None:
                 break
         return
+
+    def obtenerTipo(self, stringVariable):
+        if stringVariable == None || self._syntaxErrors > 0:
+            return None
+        listaAux = stringVariable.split(".")
+        if len(listaAux) == 1:
+            if listaAux[0].find("(") > 0:
+                listaAux[0] = listaAux[0].replace("(", "")
+                if self.claseActual == None:
+                    return self.dirPrincipal[listaAux[0]][0]
+                else:
+                    return encontrarTipoFuncionClase(self.claseActual, listaAux[0])
+            else:
+                if self.claseActual == None:
+                    if self.funcionActual == None:
+                        return self.dirPrincipal["global"][3][listaAux[0]][0]
+                    else:
+                        auxiliar = self.dirPrincipal[self.funcionActual][3].get(listaAux[0])
+                        if auxiliar != None:
+                            return auxiliar[0]
+                        else:
+                            return self.dirPrincipal["global"][3][listaAux[0]][0]
+                else:
+                    if self.funcionActual == None:
+                        return self.dirPrincipal[self.claseActual][3][listaAux[0]][0]
+                    else:
+                        auxiliar = self.dirPrincipal[self.claseActual][1][self.funcionActual][1].get(listaAux[0])
+                        if auxiliar != None:
+                            return auxiliar[0]
+                        else:
+                            return self.dirPrincipal[self.claseActual][3][listaAux[0]][0]
+        else:
+            if listaAux[1].find("(") > 0:
+                return encontrarTipoFuncionClase(listaAux[0], listaAux[1].replace("(", ""))
+            else:
+                return self.dirPrincipal[listaAux[0]][3][listaAux[1]][0]
 
     def checarClase(self):
         if self.dirPrincipal.get(self.AuxTipoVar) == None:
