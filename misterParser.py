@@ -2,6 +2,7 @@
 # encoding: utf-8
 import sys
 from antlr4 import *
+from cubo_semantico import *
 from io import StringIO
 package = globals().get("__package__", None)
 ischild = len(package)>0 if package is not None else False
@@ -262,11 +263,15 @@ class misterParser ( Parser ):
 
     variableActual = None
 
+    stackParametros = []
+
+    contAuxParametroActual = None
+
     AuxPadre = None
 
     AuxLongLista = None
 
-    dirPrincipal = {'global':[None, None, None, {}]}
+    dirPrincipal = {'global':[None, None, None, {}, None, None]}
 
     semanticaCompuestoAux = None
 
@@ -483,9 +488,9 @@ class misterParser ( Parser ):
             self._syntaxErrors = self._syntaxErrors + 1
             return
         if self.claseActual == None:
-            self.dirPrincipal[self.funcionActual] = [self.AuxTipo, None, None, {}]
+            self.dirPrincipal[self.funcionActual] = [self.AuxTipo, None, None, {}, [0,0,0,0], []]
         else:
-            self.dirPrincipal[self.claseActual][1][self.funcionActual] = [self.AuxTipo, {}]
+            self.dirPrincipal[self.claseActual][1][self.funcionActual] = [self.AuxTipo, {}, [0,0,0,0],[]]
         self.AuxTipo = None
 
     def insertarClase(self):
@@ -493,7 +498,7 @@ class misterParser ( Parser ):
             print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Clase ya existente" )
             self._syntaxErrors = self._syntaxErrors + 1
             return
-        self.dirPrincipal[self.claseActual] = [None, {}, self.AuxPadre, {} ]
+        self.dirPrincipal[self.claseActual] = [None, {}, self.AuxPadre, {}, None, None ]
         self.AuxPadre = None
 
     def insertarVariable(self):
@@ -603,7 +608,7 @@ class misterParser ( Parser ):
                 varAtributos = self.dirPrincipal['global'][3][self.semanticaCompuestoAux][2].get(atributoId)
                 if varAtributos != None:
                     if varAtributos[1] == 'PRIVADO':
-                        print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " No se puede acceder al atributo privado" )
+                        print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " No se puede acceder al atributo" )
                         self._syntaxErrors = self._syntaxErrors + 1
                         return
                 else:
@@ -615,7 +620,7 @@ class misterParser ( Parser ):
                 varAtributos = self.dirPrincipal[self.funcionActual][3][self.semanticaCompuestoAux][2].get(atributoId)
                 if varAtributos != None:
                     if varAtributos[1] == 'PRIVADO':
-                        print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " No se puede acceder al atributo privado" )
+                        print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " No se puede acceder al atributo" )
                         self._syntaxErrors = self._syntaxErrors + 1
                         return
                 
@@ -629,7 +634,7 @@ class misterParser ( Parser ):
                 varAtributos = self.dirPrincipal[self.claseActual][1][self.funcionActual][1][self.semanticaCompuestoAux][3].get(atributoId)
                 if varAtributos != None:
                     if varAtributos[1] == 'PRIVADO':
-                        print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " No se puede acceder al atributo privado" )
+                        print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " No se puede acceder al atributo" )
                         self._syntaxErrors = self._syntaxErrors + 1
                         return
                 else:
@@ -667,7 +672,7 @@ class misterParser ( Parser ):
 
     def encontrarFuncionClase(self, padre):
         if padre in ['ENTERO','DECIMAL','TEXTO','NADA', 'LISTA']:
-            print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Variable no compuesta" )
+            print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " No se puede acceder al metodo" )
             self._syntaxErrors = self._syntaxErrors + 1
             return
         
@@ -683,11 +688,52 @@ class misterParser ( Parser ):
         self._syntaxErrors = self._syntaxErrors + 1
         return
 
+    def encontrarTipoFuncionClase(self, padre):
+        while True:
+            dictAux = self.dirPrincipal[padre][1]
+            for key in dictAux.keys():
+                if self.semanticaCompuestoAux2 == key:
+                    return dictAux[key][0]
+            padre = self.dirPrincipal[padre][2]
+            if padre == None:
+                break
+        return
+
     def checarClase(self):
         if self.dirPrincipal.get(self.AuxTipoVar) == None:
             print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Clase no declarada" )
             self._syntaxErrors = self._syntaxErrors + 1
             return
+
+    def agregarParametro(self):
+        tipo = self.getCurrentToken().text
+        if self.claseActual ==  None:
+            dic = self.dirPrincipal[self.funcionActual]
+            dic[5].append(tipo)
+            if tipo == "ENTERO":
+                dic[4][0] = dic[4][0] + 1
+            elif tipo == "DECIMAL":
+                dic[4][1] = dic[4][1] + 1
+            elif tipo == "TEXTO":
+                dic[4][2] = dic[4][2] + 1
+            elif tipo == "LISTA":
+                dic[4][3] = dic[4][3] + 1
+        else: 
+            dic = self.dirPrincipal[self.claseActual][1][self.funcionActual]
+            dic[3].append(tipo)
+            if tipo == "ENTERO":
+                dic[2][0] = dic[2][0] + 1
+            elif tipo == "DECIMAL":
+                dic[2][1] = dic[2][1] + 1
+            elif tipo == "TEXTO":
+                dic[2][2] = dic[2][2] + 1
+            elif tipo == "LISTA":
+                dic[2][3] = dic[2][3] + 1
+    
+    def checarParametro(self):
+        variableParametro = self.getCurrentToken().text
+        
+
 
     def programa(self):
 
@@ -696,6 +742,7 @@ class misterParser ( Parser ):
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 142
+            auxiliar = cuboSemantico()
             self.programaAux1()
             self.state = 143
             self.programaAux3()
@@ -1859,6 +1906,7 @@ class misterParser ( Parser ):
                 semanticaCompuestoAux = None
                 semanticaCompuestoAux2 = None
 
+
             elif token in [misterParser.CTETEXTO]:
                 self.enterOuterAlt(localctx, 4)
                 self.state = 243
@@ -2091,6 +2139,7 @@ class misterParser ( Parser ):
             if token in [misterParser.ENTERO, misterParser.DECIMAL, misterParser.TEXTO]:
                 self.enterOuterAlt(localctx, 1)
                 self.state = 261
+                self.agregarParametro()
                 self.tipo()
 
             elif token in [misterParser.LISTA]:
@@ -2993,6 +3042,7 @@ class misterParser ( Parser ):
             self.llamarFuncAux1()
             self.state = 347
             self.match(misterParser.PARENTESIS2)
+            
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -3600,6 +3650,7 @@ class misterParser ( Parser ):
             self.asignacionAux1()
             self.state = 408
             self.match(misterParser.PUNTOYCOMA)
+            
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
