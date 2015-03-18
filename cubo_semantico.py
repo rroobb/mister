@@ -3,7 +3,7 @@ class cuboSemantico:
 
 	def __init__(self):
 		self.cubo_semantico = {
-		'=': {
+		'IGUAL': {
 			'ENTERO': {
 				'ENTERO': 'ENTERO',
 				'DECIMAL': None,
@@ -20,7 +20,7 @@ class cuboSemantico:
 				'TEXTO': 'TEXTO'
 			}
 		},
-		'&&': {
+		'Y': {
 			'ENTERO': {
 				'ENTERO': None,
 				'DECIMAL': None,
@@ -46,7 +46,7 @@ class cuboSemantico:
 				'bool': 'bool'
 			}
 		},
-		'||': {
+		'O': {
 			'ENTERO': {
 				'ENTERO': None,
 				'DECIMAL': None,
@@ -72,7 +72,7 @@ class cuboSemantico:
 				'bool': 'bool'
 			}
 		},
-		'>': {
+		'MAYOR': {
 			'ENTERO': {
 				'ENTERO': 'bool',
 				'DECIMAL': 'bool',
@@ -89,7 +89,7 @@ class cuboSemantico:
 				'TEXTO': 'bool'
 			}
 		},
-		'<': {
+		'MENOR': {
 			'ENTERO': {
 				'ENTERO': 'bool',
 				'DECIMAL': 'bool',
@@ -106,7 +106,7 @@ class cuboSemantico:
 				'TEXTO': 'bool'
 			}
 		},
-		'!=': {
+		'DIFERENTE': {
 			'ENTERO': {
 				'ENTERO': 'bool',
 				'DECIMAL': 'bool',
@@ -123,7 +123,7 @@ class cuboSemantico:
 				'TEXTO': 'bool'
 			}
 		},
-		'>=': {
+		'MAYORIGUAL': {
 			'ENTERO': {
 				'ENTERO': 'bool',
 				'DECIMAL': 'bool',
@@ -140,7 +140,7 @@ class cuboSemantico:
 				'TEXTO': 'bool'
 			}
 		},
-		'<=': {
+		'MENORIGUAL': {
 			'ENTERO': {
 				'ENTERO': 'bool',
 				'DECIMAL': 'bool',
@@ -157,7 +157,7 @@ class cuboSemantico:
 				'TEXTO': 'bool'
 			}
 		},
-		'==': {
+		'IDENTICO': {
 			'ENTERO': {
 				'ENTERO': 'bool',
 				'DECIMAL': 'bool',
@@ -174,7 +174,7 @@ class cuboSemantico:
 				'TEXTO': 'bool'
 			}
 		},
-		'+': {
+		'SUMA': {
 			'ENTERO': {
 				'ENTERO': 'ENTERO',
 				'DECIMAL': 'DECIMAL',
@@ -191,7 +191,7 @@ class cuboSemantico:
 				'TEXTO': None
 			}
 		},
-		'-': {
+		'RESTA': {
 			'ENTERO': {
 				'ENTERO': 'ENTERO',
 				'DECIMAL': 'DECIMAL',
@@ -208,7 +208,7 @@ class cuboSemantico:
 				'TEXTO': None
 			}
 		},
-		'*': {
+		'MULTIPLICACION': {
 			'ENTERO': {
 				'ENTERO': 'ENTERO',
 				'DECIMAL': 'DECIMAL',
@@ -225,7 +225,7 @@ class cuboSemantico:
 				'TEXTO': None
 			}
 		},
-		'/': {
+		'DIVISION': {
 			'ENTERO': {
 				'ENTERO': 'ENTERO',
 				'DECIMAL': 'DECIMAL',
