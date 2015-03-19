@@ -293,7 +293,7 @@ class misterParser ( Parser ):
 
     quadList = []
 
-    quadOperadores = [['*','/'],['+','-'],['=','!=','>','>=','<','<='],['&&','||']]
+    quadOperadores = [['*','/'],['+','-'],['==','!=','>','>=','<','<='],['&&','||']]
 
     atn = ATNDeserializer().deserialize(serializedATN())
 
@@ -623,7 +623,12 @@ class misterParser ( Parser ):
         varAtributos = None
         if self.claseActual == None:
             if self.funcionActual == None:
-                varAtributos = self.dirPrincipal['global'][3][self.semanticaCompuestoAux][2].get(atributoId)
+                varAtributos = self.dirPrincipal['global'][3].get(self.semanticaCompuestoAux)
+                if varAtributos == None:
+                    print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Variable no declarada" )
+                    self._syntaxErrors = self._syntaxErrors + 1
+                    return
+                varAtributos = varAtributos[2].get(atributoId)
                 if varAtributos != None:
                     if varAtributos[1] == 'PRIVADO':
                         print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " No se puede acceder al atributo" )
@@ -635,7 +640,14 @@ class misterParser ( Parser ):
                     return
 
             else:
-                varAtributos = self.dirPrincipal[self.funcionActual][3][self.semanticaCompuestoAux][2].get(atributoId)
+                varAtributos = self.dirPrincipal[self.funcionActual][3].get(self.semanticaCompuestoAux)
+                if varAtributos == None:
+                    varAtributos = self.dirPrincipal['global'][3].get(self.semanticaCompuestoAux)
+                    if varAtributos == None:
+                        print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Variable no declarada" )
+                        self._syntaxErrors = self._syntaxErrors + 1
+                        return
+                varAtributos = varAtributos[2].get(atributoId)
                 if varAtributos != None:
                     if varAtributos[1] == 'PRIVADO':
                         print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " No se puede acceder al atributo" )
@@ -649,7 +661,12 @@ class misterParser ( Parser ):
 
         else:
             if self.funcionActual != None:
-                varAtributos = self.dirPrincipal[self.claseActual][1][self.funcionActual][1][self.semanticaCompuestoAux][3].get(atributoId)
+                varAtributos = self.dirPrincipal[self.claseActual][1][self.funcionActual][1].get(self.semanticaCompuestoAux)
+                if varAtributos == None:
+                    print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Variable no declarada" )
+                    self._syntaxErrors = self._syntaxErrors + 1
+                    return
+                varAtributos = varAtributos[3].get(atributoId)
                 if varAtributos != None:
                     if varAtributos[1] == 'PRIVADO':
                         print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " No se puede acceder al atributo" )
@@ -674,17 +691,39 @@ class misterParser ( Parser ):
             tipo = None
             if self.claseActual == None:
                 if self.funcionActual == None:
-                    tipo = self.dirPrincipal['global'][3][self.semanticaCompuestoAux][0]
+                    tipo = self.dirPrincipal['global'][3].get(self.semanticaCompuestoAux)
+                    if tipo == None:
+                        print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Variable no declarada" )
+                        self._syntaxErrors = self._syntaxErrors + 1
+                        return
+                    tipo = tipo[0]
                     
                 else:
-                    tipo = self.dirPrincipal[self.funcionActual][3][self.semanticaCompuestoAux][0]
+                    tipo = self.dirPrincipal[self.funcionActual][3].get(self.semanticaCompuestoAux)
+                    if tipo == None:
+                        tipo = self.dirPrincipal['global'][3].get(self.semanticaCompuestoAux)
+                        if tipo == None:
+                            print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Variable no declarada" )
+                            self._syntaxErrors = self._syntaxErrors + 1
+                            return
+                    tipo = tipo[0]
             
             else:
                 if self.funcionActual == None:
-                    tipo = self.dirPrincipal[self.claseActual][3][self.semanticaCompuestoAux][0]
+                    tipo = self.dirPrincipal[self.claseActual][3].get(self.semanticaCompuestoAux)
+                    if tipo == None:
+                        print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Variable no declarada" )
+                        self._syntaxErrors = self._syntaxErrors + 1
+                        return
+                    tipo = tipo[0]
 
                 else:
-                    tipo = self.dirPrincipal[self.claseActual][1][self.funcionActual][1][self.semanticaCompuestoAux][0]
+                    tipo = self.dirPrincipal[self.claseActual][1][self.funcionActual][1].get(self.semanticaCompuestoAux)
+                    if tipo == None:
+                        print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Variable no declarada" )
+                        self._syntaxErrors = self._syntaxErrors + 1
+                        return
+                    tipo = tipo[0]
                     
             self.encontrarFuncionClase(tipo)
 
@@ -710,6 +749,17 @@ class misterParser ( Parser ):
         while True:
             dictAux = self.dirPrincipal[padre][1]
             value = dictAux.get(funcion)
+            if value != None:
+                return value[0]
+            padre = self.dirPrincipal[padre][2]
+            if padre == None:
+                break
+        return
+
+    def encontrarTipoAtributoClase(self, padre, atributo):
+        while True:
+            dictAux = self.dirPrincipal[padre][3]
+            value = dictAux.get(atributo)
             if value != None:
                 return value[0]
             padre = self.dirPrincipal[padre][2]
@@ -762,9 +812,9 @@ class misterParser ( Parser ):
                     clase = self.dirPrincipal[self.claseActual][1][self.funcionActual][1][listaAux[0]][0]
 
             if listaAux[1].find("(") > 0:
-                return encontrarTipoFuncionClase(clase, listaAux[1].replace("(", ""))
+                return self.encontrarTipoFuncionClase(clase, listaAux[1].replace("(", ""))
             else:
-                return self.dirPrincipal[clase][3][listaAux[1]][0]
+                return self.encontrarTipoAtributoClase(clase, listaAux[1])
 
     def checarClase(self):
         if self.dirPrincipal.get(self.AuxTipoVar) == None:
@@ -812,17 +862,30 @@ class misterParser ( Parser ):
         if self.pOper:
             oper = self.pOper.pop()
             if oper in self.quadOperadores[op]:
-                oDer = self.pilaO.pop()
-                oIzq = self.pilaO.pop()
-                res = self.cuboSem.checarSemanticaExp(oIzq,oDer,oper)
-                if res != None:
-                    self.quadList.append([oper,oIzq,oDer,"t" + self.contQuadTemporales])
-                    self.insertarValorTipo("t" + self.contQuadTemporales,res)
-                    self.contQuadTemporales = self.contQuadTemporales + 1
-                else:
-                    print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Tipos de operandos no compatibles" )
-                    self._syntaxErrors = self._syntaxErrors + 1
-                    return
+                if self.pilaO:
+                    oDer = self.pilaO.pop()
+                    oDerTipo = self.pTipos.pop()
+                    if self.pilaO:
+                        oIzq = self.pilaO.pop()
+                        oIzqTipo = self.pTipos.pop()
+                        res = self.cuboSem.checarSemanticaExp(oIzqTipo,oDerTipo,oper)
+                        if res != None:
+                            self.quadList.append([oper,oIzq,oDer,"t" + str(self.contQuadTemporales)])
+                            self.insertarValorTipo("t" + str(self.contQuadTemporales),res)
+                            self.contQuadTemporales = self.contQuadTemporales + 1
+                        else:
+                            print (oIzqTipo)
+                            print(oIzq)
+                            print(oDerTipo)
+                            print(oDer)
+                            print(oper)
+                            print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Tipos de operandos no compatibles" )
+                            self._syntaxErrors = self._syntaxErrors + 1
+                            return
+                    else:
+                        self.pilaO.append(oDer)
+                        self.pTipos.append(oDerTipo)
+                        self.pOper.append(oper)
             else:
                 self.pOper.append(oper)
 
@@ -1988,7 +2051,7 @@ class misterParser ( Parser ):
             elif token in [misterParser.CTEDECIMAL]:
                 self.enterOuterAlt(localctx, 2)
                 self.state = 239
-                tipoOperando = 'DECIMAL'
+                self.tipoOperando = 'DECIMAL'
                 self.operando = self.getCurrentToken().text
                 self.match(misterParser.CTEDECIMAL)
                 self.insertarValorTipo(self.operando, self.tipoOperando)
@@ -2062,7 +2125,7 @@ class misterParser ( Parser ):
                     self.insertarValorTipo(self.semanticaCompuestoAux + '(',self.tipoOperando)
                 else:
                     self.tipoOperando = self.obtenerTipo(self.semanticaCompuestoAux + '.' + self.semanticaCompuestoAux2 + '(')
-                    self.insertarValorTipo(self.semanticaCompuestoAux + '.' + self.semanticaCompuestoAux2,self.tipoOperando + '(')
+                    self.insertarValorTipo(self.semanticaCompuestoAux + '.' + self.semanticaCompuestoAux2 + '(',self.tipoOperando)
                 self.llamarFunc()
 
             elif token in [misterParser.Y, misterParser.O, misterParser.IDENTICO, misterParser.COMA, misterParser.SUMA, misterParser.RESTA, misterParser.DIVISION, misterParser.MULTIPLICACION, misterParser.DIFERENTE, misterParser.MAYORIGUAL, misterParser.MENORIGUAL, misterParser.MENOR, misterParser.MAYOR, misterParser.PARENTESIS2, misterParser.CORCHETE2, misterParser.PUNTOYCOMA]:
@@ -3094,6 +3157,7 @@ class misterParser ( Parser ):
                 self.insertarOperador('+')
                 self.state = 335
                 self.termino()
+                self.crearCuadruplo(1)
                 self.state = 336
                 self.expAux1()
 
@@ -3104,6 +3168,7 @@ class misterParser ( Parser ):
                 self.insertarOperador('-')
                 self.state = 339
                 self.termino()
+                self.crearCuadruplo(1)
                 self.state = 340
                 self.expAux1()
 
@@ -3462,6 +3527,7 @@ class misterParser ( Parser ):
                 self.insertarOperador('*')
                 self.state = 374
                 self.factor()
+                self.crearCuadruplo(0)
                 self.state = 375
                 self.terminoAux1()
 
@@ -3472,6 +3538,7 @@ class misterParser ( Parser ):
                 self.insertarOperador('/')
                 self.state = 378
                 self.factor()
+                self.crearCuadruplo(0)
                 self.state = 379
                 self.terminoAux1()
 

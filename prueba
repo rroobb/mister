@@ -55,23 +55,21 @@ FUNCION ENTERO INICIO (ENTERO parametro1 , DECIMAL parametro2) {
 	PERSONA persona;
 	ENTERO num;
 	LISTA TEXTO 3 milista = ["HOLA", "COMO", "ESTAS"];
-	ENTERO num1, num2, num3 = (4*5+num2) && 4==4 || 3!=4;
+	ENTERO num1, num2, num3 = (4*5+num2);
 	TEXTO string="hola", string2="como";
 
 	SI(5>(4/5+num2) && -4==+4 || "hola"!="como"){
-		persona.print(&rob, num.nombre);
-		ASIGNAR persona.nombre = persona.edad; 
+		persona.print(&rob); 
 	}
 	SINO{
-		MIENTRAS (x > y){
-		ASIGNAR	x = x + 1;
+		MIENTRAS (x.numero3 > y.numero1){
+		ASIGNAR	num1 = num3 + 1;
 		}
 	}
 
 	SI(5>(4/5+num2) && 4==4 || "hola"!="como"){
 		persona.print();
 		persona.print2();
-		persona.print3();
 		perimetro();
 	}
 
@@ -80,6 +78,7 @@ FUNCION ENTERO INICIO (ENTERO parametro1 , DECIMAL parametro2) {
 	SI(persona.numero3 > 8) {
 		ASIGNAR y = 10;
 	}
-
+	
+	ASIGNAR num = x.print();
 
 }
