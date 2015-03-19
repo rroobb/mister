@@ -265,6 +265,10 @@ class misterParser ( Parser ):
 
     contAuxParametroActual = None
 
+    stackParametros = []
+
+    stackContParametros = []
+
     AuxPadre = None
 
     AuxLongLista = None
@@ -768,7 +772,7 @@ class misterParser ( Parser ):
         return
 
     def obtenerTipo(self, stringVariable):
-        if stringVariable == None or self._syntaxErrors > 0:
+        if stringVariable == None :
             return None
         listaAux = stringVariable.split(".")
         if len(listaAux) == 1:
@@ -815,6 +819,45 @@ class misterParser ( Parser ):
                 return self.encontrarTipoFuncionClase(clase, listaAux[1].replace("(", ""))
             else:
                 return self.encontrarTipoAtributoClase(clase, listaAux[1])
+
+    def encontrarParametrosFuncionClase(self, padre, funcion):
+        while True:
+            dictAux = self.dirPrincipal[padre][1]
+            value = dictAux.get(funcion)
+            if value != None:
+                return value[3]
+            padre = self.dirPrincipal[padre][2]
+            if padre == None:
+                break
+        return
+
+    def obtenerParametros(self, stringVariable):
+        if stringVariable == None :
+            return None
+        listaAux = stringVariable.split(".")
+        if len(listaAux) == 1:
+            if listaAux[0].find("(") > 0:
+                listaAux[0] = listaAux[0].replace("(", "")
+                if self.claseActual == None:
+                    return self.dirPrincipal[listaAux[0]][5]
+                else:
+                    return encontrarParametrosFuncionClase(self.claseActual, listaAux[0])
+        else:
+            if self.claseActual == None:
+                if self.funcionActual == None:
+                    clase = self.dirPrincipal['global'][3][listaAux[0]][0]
+                else:
+                    clase = self.dirPrincipal[self.funcionActual][3].get(listaAux[0])
+                    if clase != None:
+                        clase = clase[0]
+                    else:
+                        clase = self.dirPrincipal['global'][3][listaAux[0]][0]
+            else:
+                if self.funcionActual != None:
+                    clase = self.dirPrincipal[self.claseActual][1][self.funcionActual][1][listaAux[0]][0]
+
+            if listaAux[1].find("(") > 0:
+                return self.encontrarParametrosFuncionClase(clase, listaAux[1].replace("(", ""))
 
     def checarClase(self):
         if self.dirPrincipal.get(self.AuxTipoVar) == None:
@@ -874,11 +917,6 @@ class misterParser ( Parser ):
                             self.insertarValorTipo("t" + str(self.contQuadTemporales),res)
                             self.contQuadTemporales = self.contQuadTemporales + 1
                         else:
-                            print (oIzqTipo)
-                            print(oIzq)
-                            print(oDerTipo)
-                            print(oDer)
-                            print(oper)
                             print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Tipos de operandos no compatibles" )
                             self._syntaxErrors = self._syntaxErrors + 1
                             return
@@ -888,6 +926,29 @@ class misterParser ( Parser ):
                         self.pOper.append(oper)
             else:
                 self.pOper.append(oper)
+
+    def checarOrdenParametros(self):
+        if len(self.stackParametros) == 0 or len(self.pTipos) == 0 or len(self.stackContParametros) == 0 :
+            return
+        listaPar = self.obtenerParametros(self.stackParametros[len(self.stackParametros) - 1])
+        cont = self.stackContParametros[len(self.stackContParametros)-1]
+        if listaPar == None or len(listaPar) < cont:
+            print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " La cantidad de parametros es incorrecta" )
+            self._syntaxErrors = self._syntaxErrors + 1
+            self.stackContParametros[len(self.stackContParametros)-1] = self.stackContParametros[len(self.stackContParametros)-1] + 1
+            return
+        if listaPar[cont] != self.pTipos[len(self.pTipos)-1]:
+            print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " El tipo de parametro es incorrecto" )
+            self._syntaxErrors = self._syntaxErrors + 1
+        self.stackContParametros[len(self.stackContParametros)-1] = self.stackContParametros[len(self.stackContParametros)-1] + 1
+
+    def checarLongitudParametros(self):
+        if len(self.obtenerParametros(self.stackParametros[len(self.stackParametros) - 1])) != self.stackContParametros[len(self.stackContParametros)-1]:
+            print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " La cantidad de parametros es incorrecta" )
+            self._syntaxErrors = self._syntaxErrors + 1
+            return
+        self.stackParametros.pop()
+        self.stackContParametros.pop()
 
     def programa(self):
 
@@ -3225,10 +3286,18 @@ class misterParser ( Parser ):
             self.enterOuterAlt(localctx, 1)
             self.state = 345
             self.match(misterParser.PARENTESIS1)
+            if self.semanticaCompuestoAux != None and self.semanticaCompuestoAux2 != None:
+                self.stackParametros.append(self.semanticaCompuestoAux + "." + self.semanticaCompuestoAux2 + "(")
+                self.stackContParametros.append(0)
+            elif self.semanticaCompuestoAux != None:
+                self.stackParametros.append(self.semanticaCompuestoAux + "(")
+                self.stackContParametros.append(0)
             self.state = 346
             self.llamarFuncAux1()
             self.state = 347
             self.match(misterParser.PARENTESIS2)
+            self.checarLongitudParametros()
+            
             
         except RecognitionException as re:
             localctx.exception = re
@@ -3348,6 +3417,7 @@ class misterParser ( Parser ):
         try:
             self.state = 363
             token = self._input.LA(1)
+            self.checarOrdenParametros()
             if token in [misterParser.COMA]:
                 self.enterOuterAlt(localctx, 1)
                 self.state = 358
