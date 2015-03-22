@@ -285,19 +285,21 @@ class misterParser ( Parser ):
 
     pTipos = [] #Pila de tipos de los operadores
 
-    tipoOperando = None
+    pSaltos = [] #Pila de saltos
 
-    operando = None
+    tipoOperando = None #Para los cuadruplos
 
-    operador = None
+    operando = None #Para los cuadruplos
 
-    contQuadTemporales = 0
+    operador = None #Para los cuadruplos
+
+    contQuadTemporales = 0 
 
     cuboSem = cuboSemantico()
 
-    quadList = []
+    quadList = [] #Cuadruplos
 
-    quadOperadores = [['*','/'],['+','-'],['==','!=','>','>=','<','<='],['&&','||']]
+    quadOperadores = [['*','/'],['+','-'],['==','!=','>','>=','<','<='],['&&','||'],['=']]
 
     atn = ATNDeserializer().deserialize(serializedATN())
 
@@ -900,8 +902,8 @@ class misterParser ( Parser ):
     def insertarOperador(self,op):
         self.pOper.append(op)
 
-    def crearCuadruplo(self,op):
-        #OP = 0 - mult,div 1 - suma,resta 2 - relacionales 3 - logicos
+    def crearCuadruploExpresion(self,op,tipoCuadruplo):
+        #OP = 0 - mult,div 1 - suma,resta 2 - relacionales 3 - logicos 4 - asignacion
         if self.pOper:
             oper = self.pOper.pop()
             if oper in self.quadOperadores[op]:
@@ -913,9 +915,12 @@ class misterParser ( Parser ):
                         oIzqTipo = self.pTipos.pop()
                         res = self.cuboSem.checarSemanticaExp(oIzqTipo,oDerTipo,oper)
                         if res != None:
-                            self.quadList.append([oper,oIzq,oDer,"t" + str(self.contQuadTemporales)])
-                            self.insertarValorTipo("t" + str(self.contQuadTemporales),res)
-                            self.contQuadTemporales = self.contQuadTemporales + 1
+                            if tipoCuadruplo == 'exp':
+                                self.quadList.append([oper,oIzq,oDer,"t" + str(self.contQuadTemporales)])
+                                self.insertarValorTipo("t" + str(self.contQuadTemporales),res)
+                                self.contQuadTemporales = self.contQuadTemporales + 1
+                            elif tipoCuadruplo == 'asignacion':
+                                self.quadList.append([oper,oDer,None,oIzq])
                         else:
                             print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Tipos de operandos no compatibles" )
                             self._syntaxErrors = self._syntaxErrors + 1
@@ -926,6 +931,50 @@ class misterParser ( Parser ):
                         self.pOper.append(oper)
             else:
                 self.pOper.append(oper)
+
+    def crearCuadruploEscritura(self):
+        if self.pilaO:
+            elemento = self.pilaO.pop()
+            elementoTipo = self.pTipos.pop()
+            self.quadList.append(['escribir',None,None,elemento])
+
+    def crearCuadruploLectura(self,elemento):
+        self.quadList.append(['leer',None,None,elemento])
+
+    def crearCuadruploCondicion(self):
+        condicion = self.pilaO.pop()
+        tipoCondicion = self.pTipos.pop()
+        if tipoCondicion != 'bool':
+            print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Tipo de operando no compatible" )
+            self._syntaxErrors = self._syntaxErrors + 1
+            return
+        else:
+            self.quadList.append(['gotof',condicion,None,None])
+            cont = len(self.quadList)
+            self.pSaltos.append(cont-1)
+
+    def crearCuadruploDecision2(self):
+        salida = self.pSaltos.pop()
+        cont = len(self.quadList)
+        self.quadList[salida][3] = str(cont)
+
+    def crearCuadruploDecision3(self):
+        falso = self.pSaltos.pop()
+        self.quadList.append(['goto',None,None,None])
+        cont = len(self.quadList)
+        self.pSaltos.append(cont-1)
+        self.quadList[falso][3] = str(cont)
+
+    def crearCuadruploCiclo1(self):
+        cont = len(self.quadList)
+        self.pSaltos.append(cont)
+
+    def crearCuadruploCiclo3(self):
+        falso = self.pSaltos.pop()
+        retorno = self.pSaltos.pop()
+        self.quadList.append(['goto',None,None,str(retorno)])
+        cont = len(self.quadList)
+        self.quadList[falso][3] = str(cont)
 
     def checarOrdenParametros(self):
         if len(self.stackParametros) == 0 or len(self.pTipos) == 0 or len(self.stackContParametros) == 0 :
@@ -2797,7 +2846,7 @@ class misterParser ( Parser ):
                 self.insertarOperador(self.operador)
                 self.state = 303
                 self.expresion()
-                self.crearCuadruplo(3)
+                self.crearCuadruploExpresion(3,'exp')
 
             elif token in [misterParser.COMA, misterParser.PARENTESIS2, misterParser.PUNTOYCOMA]:
                 self.enterOuterAlt(localctx, 2)
@@ -3106,7 +3155,7 @@ class misterParser ( Parser ):
                 self.insertarOperador(self.operador)
                 self.state = 326
                 self.exp()
-                self.crearCuadruplo(2)
+                self.crearCuadruploExpresion(2,'exp')
 
             elif token in [misterParser.Y, misterParser.O, misterParser.COMA, misterParser.PARENTESIS2, misterParser.PUNTOYCOMA]:
                 self.enterOuterAlt(localctx, 2)
@@ -3159,7 +3208,7 @@ class misterParser ( Parser ):
             self.enterOuterAlt(localctx, 1)
             self.state = 331
             self.termino()
-            self.crearCuadruplo(1)
+            self.crearCuadruploExpresion(1,'exp')
             self.state = 332
             self.expAux1()
         except RecognitionException as re:
@@ -3218,7 +3267,7 @@ class misterParser ( Parser ):
                 self.insertarOperador('+')
                 self.state = 335
                 self.termino()
-                self.crearCuadruplo(1)
+                self.crearCuadruploExpresion(1,'exp')
                 self.state = 336
                 self.expAux1()
 
@@ -3229,7 +3278,7 @@ class misterParser ( Parser ):
                 self.insertarOperador('-')
                 self.state = 339
                 self.termino()
-                self.crearCuadruplo(1)
+                self.crearCuadruploExpresion(1,'exp')
                 self.state = 340
                 self.expAux1()
 
@@ -3538,7 +3587,7 @@ class misterParser ( Parser ):
             self.enterOuterAlt(localctx, 1)
             self.state = 370
             self.factor()
-            self.crearCuadruplo(0)
+            self.crearCuadruploExpresion(0,'exp')
             self.state = 371
             self.terminoAux1()
         except RecognitionException as re:
@@ -3597,7 +3646,7 @@ class misterParser ( Parser ):
                 self.insertarOperador('*')
                 self.state = 374
                 self.factor()
-                self.crearCuadruplo(0)
+                self.crearCuadruploExpresion(0,'exp')
                 self.state = 375
                 self.terminoAux1()
 
@@ -3608,7 +3657,7 @@ class misterParser ( Parser ):
                 self.insertarOperador('/')
                 self.state = 378
                 self.factor()
-                self.crearCuadruplo(0)
+                self.crearCuadruploExpresion(0,'exp')
                 self.state = 379
                 self.terminoAux1()
 
@@ -3846,6 +3895,7 @@ class misterParser ( Parser ):
 
 
             else:
+                self.semanticaCompuestoAux2 = None
                 raise NoViableAltException(self)
 
         except RecognitionException as re:
@@ -3905,12 +3955,18 @@ class misterParser ( Parser ):
             self.compuesto()
             if self.semanticaCompuestoAux2 == None:
                 self.checarId(self.semanticaCompuestoAux)
+                self.tipoOperando = self.obtenerTipo(self.semanticaCompuestoAux)
+                self.insertarValorTipo(self.semanticaCompuestoAux,self.tipoOperando)
             else:
                 self.checarAtributo(self.semanticaCompuestoAux2)
-            self.state = 406
+                self.tipoOperando = self.obtenerTipo(self.semanticaCompuestoAux + '.' + self.semanticaCompuestoAux2)
+                self.insertarValorTipo(self.semanticaCompuestoAux + '.' + self.semanticaCompuestoAux2,self.tipoOperando)
+            self.state = 406  
             self.match(misterParser.IGUAL)
+            self.insertarOperador('=')
             self.state = 407
             self.asignacionAux1()
+            self.crearCuadruploExpresion(4,'asignacion')
             self.state = 408
             self.match(misterParser.PUNTOYCOMA)
             
@@ -4033,10 +4089,12 @@ class misterParser ( Parser ):
             self.expresion()
             self.state = 417
             self.match(misterParser.PARENTESIS2)
+            self.crearCuadruploCondicion()
             self.state = 418
             self.bloque()
             self.state = 419
             self.condicionAux1()
+            self.crearCuadruploDecision2()
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -4083,6 +4141,7 @@ class misterParser ( Parser ):
                 self.enterOuterAlt(localctx, 1)
                 self.state = 421
                 self.match(misterParser.SINO)
+                self.crearCuadruploDecision3()
                 self.state = 422
                 self.bloque()
 
@@ -4259,14 +4318,17 @@ class misterParser ( Parser ):
             self.enterOuterAlt(localctx, 1)
             self.state = 437
             self.match(misterParser.MIENTRAS)
+            self.crearCuadruploCiclo1()
             self.state = 438
             self.match(misterParser.PARENTESIS1)
             self.state = 439
             self.expresion()
             self.state = 440
             self.match(misterParser.PARENTESIS2)
+            self.crearCuadruploCondicion()
             self.state = 441
             self.bloque()
+            self.crearCuadruploCiclo3()
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -4327,6 +4389,7 @@ class misterParser ( Parser ):
             self.match(misterParser.PARENTESIS1)
             self.state = 445
             self.expresion()
+            self.crearCuadruploEscritura()
             self.state = 446
             self.escrituraAux1()
             self.state = 447
@@ -4385,6 +4448,7 @@ class misterParser ( Parser ):
                 self.match(misterParser.COMA)
                 self.state = 451
                 self.expresion()
+                self.crearCuadruploEscritura()
                 self.state = 452
                 self.escrituraAux1()
 
@@ -4449,7 +4513,10 @@ class misterParser ( Parser ):
             self.state = 458
             self.match(misterParser.PARENTESIS1)
             self.state = 459
+            idTempLectura = self.getCurrentToken().text
             self.match(misterParser.ID)
+            self.checarId(idTempLectura)
+            self.crearCuadruploLectura(idTempLectura)
             self.state = 460
             self.match(misterParser.PARENTESIS2)
             self.state = 461
