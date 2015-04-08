@@ -1,0 +1,13 @@
+FUNCION ENTERO INICIO (ENTERO parametro1 , DECIMAL parametro2) {
+	ENTERO a,b,c,d,e,f;
+	SI(f>e) {
+		MIENTRAS (a+b>c*d) {
+			ASIGNAR a = b +c;
+			ASIGNAR b = d-e;
+		}
+		ASIGNAR b=a+c;
+	} SINO {
+		ASIGNAR d = f / e;
+	}
+	ASIGNAR d = d - 3;
+}
