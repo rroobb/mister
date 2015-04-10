@@ -1,5 +1,16 @@
+FUNCION NADA hola (TEXTO h) {
+	IMPRIMIR (h);
+}
+
+FUNCION DECIMAL area (DECIMAL alto, DECIMAL ancho) {
+	DECIMAL resultado;
+	ASIGNAR resultado = alto * ancho;
+	RETORNAR resultado;
+}
+
 FUNCION ENTERO INICIO (ENTERO parametro1 , DECIMAL parametro2) {
 	ENTERO a,b,c,d,e,f;
+	TEXTO j = "rob";
 	SI(f>e) {
 		MIENTRAS (a+b>c*d) {
 			ASIGNAR a = b +c;
@@ -10,4 +21,7 @@ FUNCION ENTERO INICIO (ENTERO parametro1 , DECIMAL parametro2) {
 		ASIGNAR d = f / e;
 	}
 	ASIGNAR d = d - 3;
+	
+	hola(&j);
+	area(9.0,4.0);
 }

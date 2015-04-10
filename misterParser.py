@@ -273,11 +273,13 @@ class misterParser ( Parser ):
 
     AuxLongLista = None
 
-    dirPrincipal = {'global':[None, None, None, {}, None, None]}
+    dirPrincipal = {'global':[None, None, None, {}, None, None, None]}
 
     semanticaCompuestoAux = None
 
     semanticaCompuestoAux2 = None
+
+    terminacionProc = None #Auxiliar para saber si estas en una funcion o en el main
 
     pilaO = [] #Pila de operandos
 
@@ -512,9 +514,9 @@ class misterParser ( Parser ):
             self._syntaxErrors = self._syntaxErrors + 1
             return
         if self.claseActual == None:
-            self.dirPrincipal[self.funcionActual] = [self.AuxTipo, None, None, {}, [0,0,0,0], []]
+            self.dirPrincipal[self.funcionActual] = [self.AuxTipo, None, None, {}, [0,0,0,0], [], None]
         else:
-            self.dirPrincipal[self.claseActual][1][self.funcionActual] = [self.AuxTipo, {}, [0,0,0,0],[]]
+            self.dirPrincipal[self.claseActual][1][self.funcionActual] = [self.AuxTipo, {}, [0,0,0,0],[], None]
         self.AuxTipo = None
 
     def insertarClase(self):
@@ -522,7 +524,7 @@ class misterParser ( Parser ):
             print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Clase ya existente" )
             self._syntaxErrors = self._syntaxErrors + 1
             return
-        self.dirPrincipal[self.claseActual] = [None, {}, self.AuxPadre, {}, None, None ]
+        self.dirPrincipal[self.claseActual] = [None, {}, self.AuxPadre, {}, None, None, None]
         self.AuxPadre = None
 
     def insertarVariable(self):
@@ -976,6 +978,34 @@ class misterParser ( Parser ):
         cont = len(self.quadList)
         self.quadList[falso][3] = str(cont)
 
+    def crearCuadruploEra(self, nombreFuncion):
+        self.quadList.append(['ERA',None,None,nombreFuncion])
+
+    def crearCuadruploParam(self):
+        elemento = self.pilaO.pop()
+        elementoTipo = self.pTipos.pop()
+        self.quadList.append(['PARAM',None,None,elemento])
+
+    def crearCuadruploGosub(self, nombreFuncion):
+        self.quadList.append(['GOSUB',None,None,nombreFuncion])
+
+    def crearCuadruploTerminarProc(self):
+        self.quadList.append([self.terminacionProc,None,None,None])
+
+    def crearCuadruploInicial(self):
+        self.quadList.append(['goto',None,None,None])
+
+    def completarCuadruploInicial(self):
+        cont = len(self.quadList)
+        self.quadList[0][3] = str(cont)
+
+    def asignarDirInicioFuncion(self, nombreFuncion):
+        cont = len(self.quadList)
+        if self.claseActual == None:
+            self.dirPrincipal[nombreFuncion][6] = str(cont)
+        else:
+            self.dirPrincipal[self.claseActual][1][nombreFuncion][4] = str(cont)
+
     def checarOrdenParametros(self):
         if len(self.stackParametros) == 0 or len(self.pTipos) == 0 or len(self.stackContParametros) == 0 :
             return
@@ -1004,6 +1034,7 @@ class misterParser ( Parser ):
         localctx = misterParser.ProgramaContext(self, self._ctx, self.state)
         self.enterRule(localctx, 0, self.RULE_programa)
         try:
+            self.crearCuadruploInicial()
             self.enterOuterAlt(localctx, 1)
             self.state = 142
             self.programaAux1()
@@ -1266,6 +1297,9 @@ class misterParser ( Parser ):
                 self.state = 168
                 self.insertarFunc()
                 self.match(misterParser.INICIO)
+                self.completarCuadruploInicial()
+                self.asignarDirInicioFuncion('INICIO')
+                self.terminacionProc = 'END'
                 self.state = 169
                 self.func()
 
@@ -1323,7 +1357,9 @@ class misterParser ( Parser ):
             self.enterOuterAlt(localctx, 1)
             self.state = 173
             self.insertarFunc()
+            self.asignarDirInicioFuncion(self.funcionActual)
             self.match(misterParser.ID)
+            self.terminacionProc = 'ENDPROC'
             self.state = 174
             self.func()
             self.state = 175
@@ -2573,6 +2609,7 @@ class misterParser ( Parser ):
             self.funcAux3()
             self.state = 278
             self.match(misterParser.LLAVE2)
+            self.crearCuadruploTerminarProc()
             self.funcionActual = None
         except RecognitionException as re:
             localctx.exception = re
@@ -3341,10 +3378,12 @@ class misterParser ( Parser ):
             elif self.semanticaCompuestoAux != None:
                 self.stackParametros.append(self.semanticaCompuestoAux + "(")
                 self.stackContParametros.append(0)
+            self.crearCuadruploEra(self.semanticaCompuestoAux)
             self.state = 346
             self.llamarFuncAux1()
             self.state = 347
             self.match(misterParser.PARENTESIS2)
+            self.crearCuadruploGosub(self.stackParametros[len(self.stackParametros) - 1])
             self.checarLongitudParametros()
             
             
@@ -3402,6 +3441,7 @@ class misterParser ( Parser ):
                 self.state = 349
                 self.expresion()
                 self.state = 350
+                self.crearCuadruploParam()
                 self.llamarFuncAux2()
 
             elif token in [misterParser.REFERENCIA]:
@@ -3409,8 +3449,12 @@ class misterParser ( Parser ):
                 self.state = 352
                 self.match(misterParser.REFERENCIA)
                 self.state = 353
+                paramReferenciaId = self.getCurrentToken().text
                 self.match(misterParser.ID)
+                paramReferenciaTipo = self.obtenerTipo(paramReferenciaId)
+                self.insertarValorTipo("&" + paramReferenciaId, paramReferenciaTipo)
                 self.state = 354
+                self.crearCuadruploParam()
                 self.llamarFuncAux2()
 
             elif token in [misterParser.PARENTESIS2]:
@@ -3532,13 +3576,18 @@ class misterParser ( Parser ):
                 self.enterOuterAlt(localctx, 1)
                 self.state = 365
                 self.expresion()
+                self.crearCuadruploParam()
 
             elif token in [misterParser.REFERENCIA]:
                 self.enterOuterAlt(localctx, 2)
                 self.state = 366
                 self.match(misterParser.REFERENCIA)
                 self.state = 367
+                paramReferenciaId = self.getCurrentToken().text
                 self.match(misterParser.ID)
+                paramReferenciaTipo = self.obtenerTipo(paramReferenciaId)
+                self.insertarValorTipo("&" + paramReferenciaId, paramReferenciaTipo)
+                self.crearCuadruploParam()
 
             else:
                 raise NoViableAltException(self)
