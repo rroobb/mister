@@ -23,6 +23,7 @@ CLASE PERSONA HEREDA HUMANO {
 		FUNCION NADA print(ENTERO asdalsd){
 			ENTERO hola;
 			ASIGNAR hola = "hola";
+			RETORNAR 3;
 		}
 };
 
@@ -49,7 +50,7 @@ FUNCION DECIMAL AREA( DECIMAL base, DECIMAL altura){
 }
 
 FUNCION DECIMAL AREA2( DECIMAL base, DECIMAL altura){
-
+	RETORNAR 0.43;
 }
 
 FUNCION ENTERO INICIO (ENTERO parametro1 , DECIMAL parametro2) {

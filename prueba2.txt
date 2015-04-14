@@ -17,6 +17,7 @@ FUNCION ENTERO INICIO (ENTERO parametro1 , DECIMAL parametro2) {
 		ASIGNAR d = f / e;
 	}
 	ASIGNAR d = d - 3;
-
 	area(9.0,4.0);
+	
+	RETORNAR 0;
 }
