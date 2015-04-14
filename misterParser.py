@@ -595,6 +595,8 @@ class misterParser ( Parser ):
         if isClase:
             NombrePadre = self.AuxTipoVar
             direccionAux = None
+            if self.dirPrincipal.get(self.AuxTipoVar) == None:
+                return
             while True:
                 dictAux = self.dirPrincipal[NombrePadre][3]
                 for key in dictAux.keys():
@@ -854,7 +856,11 @@ class misterParser ( Parser ):
                         if auxiliar != None:
                             return auxiliar[0]
                         else:
-                            return self.dirPrincipal["global"][3][listaAux[0]][0]
+                            aux = self.dirPrincipal["global"][3].get(listaAux[0])
+                            if aux != None:
+                                return aux[0]
+                            else:
+                                return
                 else:
                     if self.funcionActual == None:
                         return self.dirPrincipal[self.claseActual][3][listaAux[0]][0]
@@ -873,7 +879,11 @@ class misterParser ( Parser ):
                     if clase != None:
                         clase = clase[0]
                     else:
-                        clase = self.dirPrincipal['global'][3][listaAux[0]][0]
+                        clase = self.dirPrincipal['global'][3].get(listaAux[0])
+                        if clase != None:
+                            clase = clase[0]
+                        else:
+                            return
             else:
                 if self.funcionActual != None:
                     clase = self.dirPrincipal[self.claseActual][1][self.funcionActual][1][listaAux[0]][0]
@@ -910,7 +920,11 @@ class misterParser ( Parser ):
                         if auxiliar != None:
                             return auxiliar[1]
                         else:
-                            return self.dirPrincipal["global"][3][listaAux[0]][1]
+                            aux = self.dirPrincipal["global"][3].get(listaAux[0])
+                            if aux != None:
+                                return aux[1]
+                            else:
+                                return
                 else:
                     if self.funcionActual == None:
                         return self.dirPrincipal[self.claseActual][3][listaAux[0]][2]
@@ -970,7 +984,10 @@ class misterParser ( Parser ):
                     if clase != None:
                         clase = clase[0]
                     else:
-                        clase = self.dirPrincipal['global'][3][listaAux[0]][0]
+                        clase = self.dirPrincipal['global'][3].get(listaAux[0])
+                        if clase == None:
+                            return
+                        clase = clase[0]
             else:
                 if self.funcionActual != None:
                     clase = self.dirPrincipal[self.claseActual][1][self.funcionActual][1][listaAux[0]][0]
@@ -982,6 +999,7 @@ class misterParser ( Parser ):
         if self.dirPrincipal.get(self.AuxTipoVar) == None:
             print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Clase no declarada" )
             self._syntaxErrors = self._syntaxErrors + 1
+            sys.exit()
             return
 
     def agregarParametro(self):

@@ -2,6 +2,7 @@ import sys
 from antlr4 import *
 from misterLexer import misterLexer
 from misterParser import misterParser
+from maquinaVirtual import *
  
 def main(argv):
     input = FileStream(argv[1])
