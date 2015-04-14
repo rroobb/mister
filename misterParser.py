@@ -255,6 +255,8 @@ class misterParser ( Parser ):
 
     AuxVisVar = None
 
+    RetornoTipo = None
+
     AuxTipoLista = None
 
     funcionActual = None
@@ -982,8 +984,8 @@ class misterParser ( Parser ):
         self.quadList.append(['ERA',None,None,nombreFuncion])
 
     def crearCuadruploParam(self):
-        elemento = self.pilaO.pop()
-        elementoTipo = self.pTipos.pop()
+        elemento = self.pilaO[len(self.pilaO) -1]
+        elementoTipo = self.pTipos[len(self.pTipos) - 1]
         self.quadList.append(['PARAM',None,None,elemento])
 
     def crearCuadruploGosub(self, nombreFuncion):
@@ -1017,9 +1019,22 @@ class misterParser ( Parser ):
             self.stackContParametros[len(self.stackContParametros)-1] = self.stackContParametros[len(self.stackContParametros)-1] + 1
             return
         if listaPar[cont] != self.pTipos[len(self.pTipos)-1]:
+            print(self.pTipos)
+            print(listaPar[cont])
+            print(self.pilaO)
             print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " El tipo de parametro es incorrecto" )
             self._syntaxErrors = self._syntaxErrors + 1
         self.stackContParametros[len(self.stackContParametros)-1] = self.stackContParametros[len(self.stackContParametros)-1] + 1
+
+    def validarTipoRetorno(self):
+        if self.RetornoTipo == "NADA":
+            print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " No se espera un valor de retorno" )
+        elif self.RetornoTipo != self.pTipos[len(self.stackParametros) - 1]:
+            print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Se espera un valor de retorno de tipo " + self.RetornoTipo )
+    
+    def validarNoRetorno(self):
+        if self.RetornoTipo != "NADA":
+            print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Se espera un valor de retorno de tipo " + self.RetornoTipo )
 
     def checarLongitudParametros(self):
         if len(self.obtenerParametros(self.stackParametros[len(self.stackParametros) - 1])) != self.stackContParametros[len(self.stackContParametros)-1]:
@@ -1211,6 +1226,7 @@ class misterParser ( Parser ):
         try:
             self.state = 166
             token = self._input.LA(1)
+            self.RetornoTipo = self.getCurrentToken().text
             if token in [misterParser.ENTERO]:
                 self.enterOuterAlt(localctx, 1)
                 self.state = 158
@@ -2776,10 +2792,12 @@ class misterParser ( Parser ):
                 self.match(misterParser.RETORNAR)
                 self.state = 293
                 self.expresion()
+                self.validarTipoRetorno()
                 self.state = 294
                 self.match(misterParser.PUNTOYCOMA)
 
             elif token in [misterParser.LLAVE2]:
+                self.validarNoRetorno()
                 self.enterOuterAlt(localctx, 2)
 
 
@@ -5165,6 +5183,7 @@ class misterParser ( Parser ):
         try:
             self.state = 511
             token = self._input.LA(1)
+            self.RetornoTipo = self.getCurrentToken().text
             if token in [misterParser.ENTERO, misterParser.DECIMAL, misterParser.TEXTO]:
                 self.enterOuterAlt(localctx, 1)
                 self.state = 509

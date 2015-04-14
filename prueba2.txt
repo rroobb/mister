@@ -22,6 +22,6 @@ FUNCION ENTERO INICIO (ENTERO parametro1 , DECIMAL parametro2) {
 	}
 	ASIGNAR d = d - 3;
 	
-	hola(&j);
+	hola(j);
 	area(9.0,4.0);
 }
