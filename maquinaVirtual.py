@@ -8,10 +8,9 @@ class maquinaVirtual:
 
 	cuadruplos = None
 
-	memoria = [[[],[],[]],[[],[],[]]
+	memoria = [[[],[],[]],[[],[],[]]]
 
 	stackComienzoFunciones = []
-
 
 	def __init__(self, dirPrincipal:dict, cuadruplos:list, contGlobalInt:int, contGlobalDecimal:int, contGlobalTexto:int):
 		self.dirPrincipal = dirPrincipal
