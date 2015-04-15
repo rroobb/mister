@@ -22,156 +22,138 @@ class cuboSemantico:
 		},
 		'&&': {
 			'ENTERO': {
-				'ENTERO': None,
+				'ENTERO': 'ENTERO',
 				'DECIMAL': None,
 				'TEXTO': None,
-				'bool': None
 			},
 			'DECIMAL': {
 				'ENTERO': None,
 				'DECIMAL': None,
-				'TEXTO': None,
-				'bool': None
+				'TEXTO': None
 			},
 			'TEXTO': {
 				'ENTERO': None,
 				'DECIMAL': None,
-				'TEXTO': None,
-				'bool': None
-			},
-			'bool': {
-				'ENTERO': None,
-				'DECIMAL': None,
-				'TEXTO': None,
-				'bool': 'bool'
+				'TEXTO': None
 			}
 		},
 		'||': {
 			'ENTERO': {
-				'ENTERO': None,
+				'ENTERO': 'ENTERO',
 				'DECIMAL': None,
-				'TEXTO': None,
-				'bool': None
+				'TEXTO': None
 			},
 			'DECIMAL': {
 				'ENTERO': None,
 				'DECIMAL': None,
-				'TEXTO': None,
-				'bool': None
+				'TEXTO': None
 			},
 			'TEXTO': {
 				'ENTERO': None,
 				'DECIMAL': None,
-				'TEXTO': None,
-				'bool': None
-			},
-			'bool': {
-				'ENTERO': None,
-				'DECIMAL': None,
-				'TEXTO': None,
-				'bool': 'bool'
+				'TEXTO': None
 			}
 		},
 		'>': {
 			'ENTERO': {
-				'ENTERO': 'bool',
-				'DECIMAL': 'bool',
+				'ENTERO': 'ENTERO',
+				'DECIMAL': 'ENTERO',
 				'TEXTO': None
 			},
 			'DECIMAL': {
-				'ENTERO': 'bool',
-				'DECIMAL': 'bool',
+				'ENTERO': 'ENTERO',
+				'DECIMAL': 'ENTERO',
 				'TEXTO': None
 			},
 			'TEXTO': {
 				'ENTERO': None,
 				'DECIMAL': None,
-				'TEXTO': 'bool'
+				'TEXTO': 'ENTERO'
 			}
 		},
 		'<': {
 			'ENTERO': {
-				'ENTERO': 'bool',
-				'DECIMAL': 'bool',
+				'ENTERO': 'ENTERO',
+				'DECIMAL': 'ENTERO',
 				'TEXTO': None
 			},
 			'DECIMAL': {
-				'ENTERO': 'bool',
-				'DECIMAL': 'bool',
+				'ENTERO': 'ENTERO',
+				'DECIMAL': 'ENTERO',
 				'TEXTO': None
 			},
 			'TEXTO': {
 				'ENTERO': None,
 				'DECIMAL': None,
-				'TEXTO': 'bool'
+				'TEXTO': 'ENTERO'
 			}
 		},
 		'!=': {
 			'ENTERO': {
-				'ENTERO': 'bool',
-				'DECIMAL': 'bool',
+				'ENTERO': 'ENTERO',
+				'DECIMAL': 'ENTERO',
 				'TEXTO': None
 			},
 			'DECIMAL': {
-				'ENTERO': 'bool',
-				'DECIMAL': 'bool',
+				'ENTERO': 'ENTERO',
+				'DECIMAL': 'ENTERO',
 				'TEXTO': None
 			},
 			'TEXTO': {
 				'ENTERO': None,
 				'DECIMAL': None,
-				'TEXTO': 'bool'
+				'TEXTO': 'ENTERO'
 			}
 		},
 		'>=': {
 			'ENTERO': {
-				'ENTERO': 'bool',
-				'DECIMAL': 'bool',
+				'ENTERO': 'ENTERO',
+				'DECIMAL': 'ENTERO',
 				'TEXTO': None
 			},
 			'DECIMAL': {
-				'ENTERO': 'bool',
-				'DECIMAL': 'bool',
+				'ENTERO': 'ENTERO',
+				'DECIMAL': 'ENTERO',
 				'TEXTO': None
 			},
 			'TEXTO': {
 				'ENTERO': None,
 				'DECIMAL': None,
-				'TEXTO': 'bool'
+				'TEXTO': 'ENTERO'
 			}
 		},
 		'<=': {
 			'ENTERO': {
-				'ENTERO': 'bool',
-				'DECIMAL': 'bool',
+				'ENTERO': 'ENTERO',
+				'DECIMAL': 'ENTERO',
 				'TEXTO': None
 			},
 			'DECIMAL': {
-				'ENTERO': 'bool',
-				'DECIMAL': 'bool',
+				'ENTERO': 'ENTERO',
+				'DECIMAL': 'ENTERO',
 				'TEXTO': None
 			},
 			'TEXTO': {
 				'ENTERO': None,
 				'DECIMAL': None,
-				'TEXTO': 'bool'
+				'TEXTO': 'ENTERO'
 			}
 		},
 		'==': {
 			'ENTERO': {
-				'ENTERO': 'bool',
-				'DECIMAL': 'bool',
+				'ENTERO': 'ENTERO',
+				'DECIMAL': 'ENTERO',
 				'TEXTO': None
 			},
 			'DECIMAL': {
-				'ENTERO': 'bool',
-				'DECIMAL': 'bool',
+				'ENTERO': 'ENTERO',
+				'DECIMAL': 'ENTERO',
 				'TEXTO': None
 			},
 			'TEXTO': {
 				'ENTERO': None,
 				'DECIMAL': None,
-				'TEXTO': 'bool'
+				'TEXTO': 'ENTERO'
 			}
 		},
 		'+': {

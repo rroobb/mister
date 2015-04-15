@@ -1079,7 +1079,7 @@ class misterParser ( Parser ):
     def crearCuadruploCondicion(self):
         condicion = self.pilaO.pop()
         tipoCondicion = self.pTipos.pop()
-        if tipoCondicion != 'bool':
+        if tipoCondicion != 'ENTERO':
             print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Tipo de operando no compatible" )
             self._syntaxErrors = self._syntaxErrors + 1
             return

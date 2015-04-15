@@ -8,7 +8,7 @@ class maquinaVirtual:
 
 	cuadruplos = None
 
-	memoria = [[[],[],[]],[[],[],[],[]]]
+	memoria = [[[],[],[]],[[],[],[]]
 
 	stackComienzoFunciones = []
 
@@ -36,10 +36,6 @@ class maquinaVirtual:
 				indexs[1] = 2
 				indexs[2] = direccion - 21000 + self.stackComienzoFunciones[len(stackComienzoFunciones) - 1][2]
 				return indexs
-			elif direccion >= 27000 and direccion < 28000:
-				indexs[1] = 3
-				indexs[2] = direccion - 27000 + self.stackComienzoFunciones[len(stackComienzoFunciones) - 1][3]
-				return indexs
 		else:
 			if direccion < 3000:
 				indexs[1] = 0
@@ -55,8 +51,8 @@ class maquinaVirtual:
 				return indexs
 
 	def operacionBasica(self, op:str):
-		aux1 = None
-		aux2 = None
+		aux1 = 0
+		aux2 = 0
 		if type(self.cuadruplos[self.InstruccionIndex][1]) is int:
 			indexs = self.obtenerDireccion(self.cuadruplos[self.InstruccionIndex][1])
 			aux1 = self.memoria[indexs[0]][indexs[1]][indexs[2]]
@@ -78,8 +74,48 @@ class maquinaVirtual:
 			self.memoria[indexs[0]][indexs[1]][indexs[2]] = aux1 * aux2
 		elif op == "/":
 			self.memoria[indexs[0]][indexs[1]][indexs[2]] = aux1 / aux2
-		else:
+		elif op == "-":
 			self.memoria[indexs[0]][indexs[1]][indexs[2]] = aux1 - aux2
+		elif op == "==":
+			if aux1 == aux2:
+				self.memoria[indexs[0]][indexs[1]][indexs[2]] = 1
+			else:
+				self.memoria[indexs[0]][indexs[1]][indexs[2]] = 0
+		elif op == ">":
+			if aux1 > aux2:
+				self.memoria[indexs[0]][indexs[1]][indexs[2]] = 1
+			else:
+				self.memoria[indexs[0]][indexs[1]][indexs[2]] = 0
+		elif op == "&&":
+			if aux1 and aux2:
+				self.memoria[indexs[0]][indexs[1]][indexs[2]] = 1
+			else:
+				self.memoria[indexs[0]][indexs[1]][indexs[2]] = 0
+		elif op == "||":
+			if aux1 or aux2:
+				self.memoria[indexs[0]][indexs[1]][indexs[2]] = 1
+			else:
+				self.memoria[indexs[0]][indexs[1]][indexs[2]] = 0
+		elif op == "<":
+			if aux1 < aux2:
+				self.memoria[indexs[0]][indexs[1]][indexs[2]] = 1
+			else:
+				self.memoria[indexs[0]][indexs[1]][indexs[2]] = 0
+		elif op == "!=":
+			if aux1 != aux2:
+				self.memoria[indexs[0]][indexs[1]][indexs[2]] = 1
+			else:
+				self.memoria[indexs[0]][indexs[1]][indexs[2]] = 0
+		elif op == ">=":
+			if aux1 >= aux2:
+				self.memoria[indexs[0]][indexs[1]][indexs[2]] = 1
+			else:
+				self.memoria[indexs[0]][indexs[1]][indexs[2]] = 0
+		elif op == "<=":
+			if aux1 <= aux2:
+				self.memoria[indexs[0]][indexs[1]][indexs[2]] = 1
+			else:
+				self.memoria[indexs[0]][indexs[1]][indexs[2]] = 0
 
 	def escribir(self):
 		aux1 = None
@@ -108,29 +144,10 @@ class maquinaVirtual:
 
 	def empezar(self):
 		while (self.cuadruplos[self.InstruccionIndex[0]] != "END"):
-			if self.cuadruplos[self.InstruccionIndex][0] in ["+", "-", "*", "/"]:
+			if self.cuadruplos[self.InstruccionIndex][0] in ["+", "-", "*", "/", "==", ">", "&&", "||", "<", "!=", ">=", "<="]:
 				self.operacionBasica(self.cuadruplos[self.InstruccionIndex][0])
 
-			
-			#elif self.cuadruplos[self.InstruccionIndex][0] == "=":
-
 			#elif self.cuadruplos[self.InstruccionIndex][0] == "goto":
-
-			#elif self.cuadruplos[self.InstruccionIndex][0] == "==":
-
-			#elif self.cuadruplos[self.InstruccionIndex][0] == ">":
-
-			#elif self.cuadruplos[self.InstruccionIndex][0] == "&&":
-
-			#elif self.cuadruplos[self.InstruccionIndex][0] == "||":
-
-			#elif self.cuadruplos[self.InstruccionIndex][0] == "<":
-
-			#elif self.cuadruplos[self.InstruccionIndex][0] == "!=":
-
-			#elif self.cuadruplos[self.InstruccionIndex][0] == ">=":
-
-			#elif self.cuadruplos[self.InstruccionIndex][0] == "<=":
 
 			#elif self.cuadruplos[self.InstruccionIndex][0] == "ENDPROC":
 
