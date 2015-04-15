@@ -188,7 +188,7 @@ class cuboSemantico:
 			'TEXTO': {
 				'ENTERO': None,
 				'DECIMAL': None,
-				'TEXTO': None
+				'TEXTO': 'TEXTO'
 			}
 		},
 		'-': {
