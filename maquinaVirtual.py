@@ -12,12 +12,15 @@ class maquinaVirtual:
 
 	stackComienzoFunciones = []
 
-	def __init__(self, dirPrincipal:dict, cuadruplos:list, contGlobalInt:int, contGlobalDecimal:int, contGlobalTexto:int):
+	def __init__(self, dirPrincipal:dict, cuadruplos:list, contGlobalInt:int, contGlobalDecimal:int, contGlobalTexto:int, contInicioInt:int, contInicioDecimal:int, contInicioTexto:int):
 		self.dirPrincipal = dirPrincipal
 		self.cuadruplos = cuadruplos
 		self.memoria[0][0] = [0] * contGlobalInt
 		self.memoria[0][1] = [0.0] * contGlobalDecimal
 		self.memoria[0][2] = [""] * contGlobalTexto
+		self.memoria[1][0] = [0] * contInicioInt
+		self.memoria[1][1] = [0.0] * contInicioDecimal
+		self.memoria[1][2] = [""] * contInicioTexto
 
 	def obtenerDireccion(self, direccion:int):
 		indexs = [0, 0, 0]
@@ -141,12 +144,18 @@ class maquinaVirtual:
 		elif indexs[1] == 2:
 			self.memoria[indexs[0]][indexs[1]][indexs[2]] = input('Escribe tu entrada:')
 
+	def gotof(self):
+		indexs = self.obtenerDireccion(self.cuadruplos[self.InstruccionIndex][1])
+		if self.memoria[indexs[0]][indexs[1]][indexs[2]] == 0:
+			self.InstruccionIndex = self.cuadruplos[self.InstruccionIndex][3] - 1
+
 	def empezar(self):
 		while (self.cuadruplos[self.InstruccionIndex[0]] != "END"):
 			if self.cuadruplos[self.InstruccionIndex][0] in ["+", "-", "*", "/", "==", ">", "&&", "||", "<", "!=", ">=", "<="]:
 				self.operacionBasica(self.cuadruplos[self.InstruccionIndex][0])
 
-			#elif self.cuadruplos[self.InstruccionIndex][0] == "goto":
+			elif self.cuadruplos[self.InstruccionIndex][0] == "goto":
+				self.InstruccionIndex = self.cuadruplos[self.InstruccionIndex][3] - 1
 
 			#elif self.cuadruplos[self.InstruccionIndex][0] == "ENDPROC":
 
@@ -154,7 +163,8 @@ class maquinaVirtual:
 
 			#elif self.cuadruplos[self.InstruccionIndex][0] == "PARAM":
 
-			#elif self.cuadruplos[self.InstruccionIndex][0] == "gotof":
+			elif self.cuadruplos[self.InstruccionIndex][0] == "gotof":
+				self.gotof()
 
 			#elif self.cuadruplos[self.InstruccionIndex][0] == "GOSUB":
 
@@ -165,6 +175,7 @@ class maquinaVirtual:
 				self.leer()
 
 			self.InstruccionIndex = self.InstruccionIndex + 1
+
 
 
 
