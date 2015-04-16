@@ -2,6 +2,7 @@ FUNCION ENTERO INICIO (ENTERO parametro1 , DECIMAL parametro2) {
 	ENTERO num1 = 5;
 	ENTERO num2 = 4;
 	ASIGNAR num1 = num1 + num2;
+	LEER(num2);
 	RETORNAR 0;
 
 }
