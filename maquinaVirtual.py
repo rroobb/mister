@@ -29,14 +29,12 @@ class maquinaVirtual:
 		self.stackCantidadEspacio.append([contInicioInt,contInicioDecimal, contInicioTexto])
 
 	def obtenerDireccion(self, direccion:int):
-		print(direccion)
 		indexs = [0, 0, 0]
 		if direccion >= 9000:
 			indexs[0] = 1
 			if direccion >= 9000 and direccion < 15000:
 				indexs[1] = 0
 				indexs[2] = direccion - 9000 + self.stackComienzoFunciones[len(self.stackComienzoFunciones) - 1][0]
-				print(indexs)
 				return indexs
 			elif direccion >= 15000 and direccion < 21000:
 				indexs[1] = 1
@@ -79,7 +77,6 @@ class maquinaVirtual:
 
 		indexs = self.obtenerDireccion(self.cuadruplos[self.InstruccionIndex][3])
 		if op == "+":
-			print(self.memoria[1][0])
 			self.memoria[indexs[0]][indexs[1]][indexs[2]] = aux1 + aux2
 		elif op == "*":
 			self.memoria[indexs[0]][indexs[1]][indexs[2]] = aux1 * aux2
