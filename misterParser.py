@@ -2500,7 +2500,7 @@ class misterParser ( Parser ):
                 self.tipoOperando = 'ENTERO'
                 self.operando = self.getCurrentToken().text
                 self.match(misterParser.CTENTERO)
-                self.insertarValorTipo([self.operando], self.tipoOperando)
+                self.insertarValorTipo([int(self.operando)], self.tipoOperando)
 
             elif token in [misterParser.CTEDECIMAL]:
                 self.enterOuterAlt(localctx, 2)
@@ -2508,7 +2508,7 @@ class misterParser ( Parser ):
                 self.tipoOperando = 'DECIMAL'
                 self.operando = self.getCurrentToken().text
                 self.match(misterParser.CTEDECIMAL)
-                self.insertarValorTipo([self.operando], self.tipoOperando)
+                self.insertarValorTipo([float(self.operando)], self.tipoOperando)
 
             elif token in [misterParser.ID]:
                 self.enterOuterAlt(localctx, 3)
@@ -2917,12 +2917,12 @@ class misterParser ( Parser ):
             self.state = 275
             self.funcAux1()
             self.state = 276
-            self.asignarTamanioFuncion()
             self.funcAux2()
             self.state = 277
             self.funcAux3()
             self.state = 278
             self.match(misterParser.LLAVE2)
+            self.asignarTamanioFuncion()
             self.crearCuadruploTerminarProc()
             self.funcionActual = None
         except RecognitionException as re:
