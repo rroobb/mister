@@ -1241,7 +1241,7 @@ class misterParser ( Parser ):
     def crearCuadruploCiclo3(self):
         falso = self.pSaltos.pop()
         retorno = self.pSaltos.pop()
-        self.quadList.append(['goto',None,None,str(retorno)])
+        self.quadList.append(['goto',None,None,retorno])
         cont = len(self.quadList)
         self.quadList[falso][3] = cont
 
