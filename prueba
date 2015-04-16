@@ -5,10 +5,10 @@ FUNCION ENTERO INICIO (ENTERO parametro1 , DECIMAL parametro2) {
 	ENTERO num1 = 5;
 	ENTERO num2 = 4;
 	ASIGNAR num1 = 1;
-	SI (num1 > num2){
-		ASIGNAR num2 = 0;
+	MIENTRAS (num1 != 10){
+		ASIGNAR num1 = num1 + 1;
 	}
-	IMPRIMIR(num2);	
+	IMPRIMIR(num1);	
 	RETORNAR 0;
 
 }
