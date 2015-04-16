@@ -10,9 +10,11 @@ class maquinaVirtual:
 
 	memoria = [[[],[],[]],[[],[],[]]]
 
-	stackComienzoFunciones = [] #[INt, decimal , texto]
+	stackComienzoFunciones = [] #cada elemento [INt, decimal , texto]
 
-	stackCantidadEspacio = []  #[INt, decimal , texto]
+	stackCantidadEspacio = []  #cada elemento [Int, decimal , texto]
+
+	stackPorReferenciaFunciones = [] #cada elemento[[direccion, direccion], ...]
 
 	def __init__(self, dirPrincipal:dict, cuadruplos:list, contGlobalInt:int, contGlobalDecimal:int, contGlobalTexto:int, contInicioInt:int, contInicioDecimal:int, contInicioTexto:int):
 		self.dirPrincipal = dirPrincipal
@@ -23,22 +25,26 @@ class maquinaVirtual:
 		self.memoria[1][0] = [0] * contInicioInt
 		self.memoria[1][1] = [0.0] * contInicioDecimal
 		self.memoria[1][2] = [""] * contInicioTexto
+		self.stackComienzoFunciones.append([0,0,0])
+		self.stackCantidadEspacio.append([contInicioInt,contInicioDecimal, contInicioTexto])
 
 	def obtenerDireccion(self, direccion:int):
+		print(direccion)
 		indexs = [0, 0, 0]
 		if direccion >= 9000:
 			indexs[0] = 1
 			if direccion >= 9000 and direccion < 15000:
 				indexs[1] = 0
-				indexs[2] = direccion - 9000 + self.stackComienzoFunciones[len(stackComienzoFunciones) - 1][0]
+				indexs[2] = direccion - 9000 + self.stackComienzoFunciones[len(self.stackComienzoFunciones) - 1][0]
+				print(indexs)
 				return indexs
 			elif direccion >= 15000 and direccion < 21000:
 				indexs[1] = 1
-				indexs[2] = direccion - 15000 + self.stackComienzoFunciones[len(stackComienzoFunciones) - 1][1]
+				indexs[2] = direccion - 15000 + self.stackComienzoFunciones[len(self.stackComienzoFunciones) - 1][1]
 				return indexs
 			elif direccion >= 21000 and direccion < 27000:
 				indexs[1] = 2
-				indexs[2] = direccion - 21000 + self.stackComienzoFunciones[len(stackComienzoFunciones) - 1][2]
+				indexs[2] = direccion - 21000 + self.stackComienzoFunciones[len(self.stackComienzoFunciones) - 1][2]
 				return indexs
 		else:
 			if direccion < 3000:
@@ -73,6 +79,7 @@ class maquinaVirtual:
 
 		indexs = self.obtenerDireccion(self.cuadruplos[self.InstruccionIndex][3])
 		if op == "+":
+			print(self.memoria[1][0])
 			self.memoria[indexs[0]][indexs[1]][indexs[2]] = aux1 + aux2
 		elif op == "*":
 			self.memoria[indexs[0]][indexs[1]][indexs[2]] = aux1 * aux2
@@ -151,25 +158,39 @@ class maquinaVirtual:
 		if self.memoria[indexs[0]][indexs[1]][indexs[2]] == 0:
 			self.InstruccionIndex = self.cuadruplos[self.InstruccionIndex][3] - 1
 
+	def asignar(self):
+		aux1 = None
+		if type(self.cuadruplos[self.InstruccionIndex][1]) is int:
+			indexs = self.obtenerDireccion(self.cuadruplos[self.InstruccionIndex][1])
+			aux1 = self.memoria[indexs[0]][indexs[1]][indexs[2]]
+
+		elif type(self.cuadruplos[self.InstruccionIndex][1]) is list:
+			aux1 = self.cuadruplos[self.InstruccionIndex][1][0]	
+
+		indexs = self.obtenerDireccion(self.cuadruplos[self.InstruccionIndex][3])
+		self.memoria[indexs[0]][indexs[1]][indexs[2]] = aux1
 
 
-ERA, null, null, [contEnteros,contDecimales,contTextos]
+#ERA, null, null, [contEnteros,contDecimales,contTextos]
 
-PARAM,null,null,elemento
+#PARAM,null,null,elemento
 
-GOSUB,null,null,direccionInicioFuncion
+#GOSUB,null,null,direccionInicioFuncion
 
-[ENDPROC, None, None, None]
+#[ENDPROC, None, None, None]
 
-[END, None, None, None]
+#[END, None, None, None]
 
 	def empezar(self):
-		while (self.cuadruplos[self.InstruccionIndex[0]] != "END"):
+		while (self.cuadruplos[self.InstruccionIndex][0] != "END"):
 			if self.cuadruplos[self.InstruccionIndex][0] in ["+", "-", "*", "/", "==", ">", "&&", "||", "<", "!=", ">=", "<="]:
 				self.operacionBasica(self.cuadruplos[self.InstruccionIndex][0])
 
 			elif self.cuadruplos[self.InstruccionIndex][0] == "goto":
 				self.InstruccionIndex = self.cuadruplos[self.InstruccionIndex][3] - 1
+
+			elif self.cuadruplos[self.InstruccionIndex][0] == "=":
+				self.asignar()
 
 			#elif self.cuadruplos[self.InstruccionIndex][0] == "ENDPROC":
 
