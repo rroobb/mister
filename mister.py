@@ -12,5 +12,7 @@ def main(argv):
     tree = parser.programa()
     print(parser.quadList)
     #print(parser.dirPrincipal)
+    #if parser._syntaxErrors == 0:
+    	#maquina = maquinaVirtual(parser.dirPrincipal, parser.quadList, , , , , , )
 if __name__ == '__main__':
     main(sys.argv)

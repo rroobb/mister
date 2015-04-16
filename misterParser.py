@@ -1213,7 +1213,7 @@ class misterParser ( Parser ):
     def crearCuadruploCondicion(self):
         condicion = self.pilaO.pop()
         tipoCondicion = self.pTipos.pop()
-        if tipoCondicion != 'bool':
+        if tipoCondicion != 'ENTERO':
             print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Tipo de operando no compatible" )
             self._syntaxErrors = self._syntaxErrors + 1
             return
@@ -1298,9 +1298,6 @@ class misterParser ( Parser ):
             self.stackContParametros[len(self.stackContParametros)-1] = self.stackContParametros[len(self.stackContParametros)-1] + 1
             return
         if listaPar[cont] != self.pTipos[len(self.pTipos)-1]:
-            print(self.pTipos)
-            print(listaPar[cont])
-            print(self.pilaO)
             print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " El tipo de parametro es incorrecto" )
             self._syntaxErrors = self._syntaxErrors + 1
         self.stackContParametros[len(self.stackContParametros)-1] = self.stackContParametros[len(self.stackContParametros)-1] + 1
