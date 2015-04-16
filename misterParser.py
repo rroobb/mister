@@ -4885,7 +4885,8 @@ class misterParser ( Parser ):
             idTempLectura = self.getCurrentToken().text
             self.match(misterParser.ID)
             self.checarId(idTempLectura)
-            self.crearCuadruploLectura(idTempLectura)
+            leerDirAux = self.obtenerDireccionVariable(idTempLectura)
+            self.crearCuadruploLectura(leerDirAux)
             self.state = 460
             self.match(misterParser.PARENTESIS2)
             self.state = 461
