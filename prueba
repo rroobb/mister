@@ -5,8 +5,13 @@ FUNCION ENTERO INICIO (ENTERO parametro1 , DECIMAL parametro2) {
 	ENTERO num1 = 5;
 	ENTERO num2 = 4;
 	ASIGNAR num1 = 1;
-	MIENTRAS (num1 != 10){
-		ASIGNAR num1 = num1 + 1;
+	MIENTRAS (num1 < 10){
+		SI (num1 > 5){
+			ASIGNAR num1 = 20;	
+		}
+		SINO{
+			ASIGNAR num1 = num1 + 1;
+		}
 	}
 	IMPRIMIR(num1);	
 	RETORNAR 0;
