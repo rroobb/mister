@@ -191,8 +191,3 @@ GOSUB,null,null,direccionInicioFuncion
 			self.InstruccionIndex = self.InstruccionIndex + 1
 
 
-
-
-
-			
-		
