@@ -1225,14 +1225,14 @@ class misterParser ( Parser ):
     def crearCuadruploDecision2(self):
         salida = self.pSaltos.pop()
         cont = len(self.quadList)
-        self.quadList[salida][3] = str(cont)
+        self.quadList[salida][3] = cont
 
     def crearCuadruploDecision3(self):
         falso = self.pSaltos.pop()
         self.quadList.append(['goto',None,None,None])
         cont = len(self.quadList)
         self.pSaltos.append(cont-1)
-        self.quadList[falso][3] = str(cont)
+        self.quadList[falso][3] = cont
 
     def crearCuadruploCiclo1(self):
         cont = len(self.quadList)
@@ -1243,7 +1243,7 @@ class misterParser ( Parser ):
         retorno = self.pSaltos.pop()
         self.quadList.append(['goto',None,None,str(retorno)])
         cont = len(self.quadList)
-        self.quadList[falso][3] = str(cont)
+        self.quadList[falso][3] = cont
 
     def crearCuadruploEra(self, nombreFuncion):
         tamAux = self.obtenerTamanioFuncion(nombreFuncion)
