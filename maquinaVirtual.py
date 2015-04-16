@@ -18,7 +18,5 @@ class maquinaVirtual:
 		self.dirPrincipal = dirPrincipal
 		self.cuadruplos = cuadruplos
 
-	def empezar(self):
-		while (self.cuadruplos[self.InstruccionIndex[0]] != "END"){
-			
-		}
+	#def empezar(self):
+		#while self.cuadruplos[self.InstruccionIndex[0]] != "END":

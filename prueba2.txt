@@ -1,23 +1,48 @@
-ENTERO a,b,c,d,e,f;
+ENTERO a,b,c;
+DECIMAL d,e,f;
+TEXTO i;
 
 FUNCION DECIMAL area (DECIMAL alto, DECIMAL ancho) {
 	DECIMAL resultado;
+	ASIGNAR i = "area";
 	ASIGNAR resultado = alto * ancho;
 	RETORNAR resultado;
 }
 
+FUNCION NADA print (TEXTO x) {
+	TEXTO i;
+	ASIGNAR i = x;
+	IMPRIMIR(i);
+}
+
 FUNCION ENTERO INICIO (ENTERO parametro1 , DECIMAL parametro2) {
+	ENTERO x;
+	LISTA ENTERO 3 milista = [2,1,2];
+	ENTERO y;
+	DECIMAL z,w;
+	TEXTO v;
+	
 	SI(f>e) {
 		MIENTRAS (a+b>c*d) {
 			ASIGNAR a = b +c;
-			ASIGNAR b = d-e;
+			ASIGNAR f = d-e;
 		}
 		ASIGNAR b=a+c;
 	} SINO {
 		ASIGNAR d = f / e;
 	}
 	ASIGNAR d = d - 3;
-	area(9.0,4.0);
+	area(9.0+3.0,4.0);
+	
+	ASIGNAR z = 8.0;
+	ASIGNAR w = 3.0;
+	area(z,w);
+	
+	ASIGNAR v = "hola";
+	print(v);
+	
+	ASIGNAR x = 2;
+	ASIGNAR y = 4;
 	
 	RETORNAR 0;
 }

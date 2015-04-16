@@ -241,14 +241,6 @@ class misterParser ( Parser ):
 # 0 -> void, 1 -> entero, 2 -> decimal, 3 -> texto, 4 -> lista
     grammarFileName = "java-escape"
 
-    contEnteros = 0
-
-    contDecimal = 0
-
-    contLista = 0
-
-    contTexto = 0
-
     AuxTipo = None
 
     AuxTipoVar = None
@@ -277,7 +269,7 @@ class misterParser ( Parser ):
 
     AuxLongLista = None
 
-    dirPrincipal = {'global':[None, None, None, {}, None, None, None]}
+    dirPrincipal = {'global':[None, None, None, {}, None, None, None, None]}
 
     semanticaCompuestoAux = None
 
@@ -299,19 +291,23 @@ class misterParser ( Parser ):
 
     operador = None #Para los cuadruplos
 
-    contQuadTemporales = 0 
-
     cuboSem = cuboSemantico()
 
     quadList = [] #Cuadruplos
 
     quadOperadores = [['*','/'],['+','-'],['==','!=','>','>=','<','<='],['&&','||'],['=']]
 
-    memGlobalEntero = 0 #Contador para memoria virtual de variables globales enteras
+    memGlobalEntero = -1 #Contador para memoria virtual de variables globales enteras
 
-    memGlobalDecimal = 3000 #Contador para memoria virtual de variables globales decimales
+    memGlobalDecimal = 2999 #Contador para memoria virtual de variables globales decimales
 
-    memGlobalTexto = 6000 #Contador para memoria virtual de variables globales texto
+    memGlobalTexto = 5999 #Contador para memoria virtual de variables globales texto
+
+    memLocalEntero = 8999 #Contador para memoria virtual de variables locales y temporales enteras
+
+    memLocalDecimal = 14999 #Contador para memoria virtual de variables locales y temporales decimales
+
+    memLocalTexto = 20999 #Contador para memoria virtual de variables locales y temporales texto
 
     atn = ATNDeserializer().deserialize(serializedATN())
 
@@ -524,9 +520,9 @@ class misterParser ( Parser ):
             self._syntaxErrors = self._syntaxErrors + 1
             return
         if self.claseActual == None:
-            self.dirPrincipal[self.funcionActual] = [self.AuxTipo, None, None, {}, [0,0,0,0], [], None]
+            self.dirPrincipal[self.funcionActual] = [self.AuxTipo, None, None, {}, [0,0,0,0], [], None, [0,0,0]]
         else:
-            self.dirPrincipal[self.claseActual][1][self.funcionActual] = [self.AuxTipo, {}, [0,0,0,0],[], None]
+            self.dirPrincipal[self.claseActual][1][self.funcionActual] = [self.AuxTipo, {}, [0,0,0,0], [], None, [0,0,0]]
         self.AuxTipo = None
 
     def insertarClase(self):
@@ -534,7 +530,7 @@ class misterParser ( Parser ):
             print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Clase ya existente" )
             self._syntaxErrors = self._syntaxErrors + 1
             return
-        self.dirPrincipal[self.claseActual] = [None, {}, self.AuxPadre, {}, None, None, None]
+        self.dirPrincipal[self.claseActual] = [None, {}, self.AuxPadre, {}, None, None, None, [0,0,0]]
         self.AuxPadre = None
 
     def insertarVariable(self):
@@ -546,24 +542,27 @@ class misterParser ( Parser ):
         #Variables globales
         if self.claseActual == None and self.funcionActual == None:
             if self.AuxTipoVar == "ENTERO":
-                direccion = self.memGlobalEntero
                 self.memGlobalEntero = self.memGlobalEntero + 1
+                direccion = self.memGlobalEntero
             elif self.AuxTipoVar == "DECIMAL":
-                direccion = self.memGlobalDecimal
                 self.memGlobalDecimal = self.memGlobalDecimal + 1
+                direccion = self.memGlobalDecimal
             elif self.AuxTipoVar == "TEXTO":
-                direccion = self.memGlobalTexto
                 self.memGlobalTexto = self.memGlobalTexto + 1
+                direccion = self.memGlobalTexto
             elif self.AuxTipoVar == "LISTA":
                 if self.AuxTipoLista == "ENTERO":
+                    self.memGlobalEntero = self.memGlobalEntero + 1
                     direccion = self.memGlobalEntero
-                    self.memGlobalEntero = self.memGlobalEntero + int(self.AuxTamanioLista)
+                    self.memGlobalEntero = self.memGlobalEntero + int(self.AuxTamanioLista) - 1
                 elif self.AuxTipoLista == "DECIMAL":
+                    self.memGlobalDecimal = self.memGlobalDecimal + 1
                     direccion = self.memGlobalDecimal
-                    self.memGlobalDecimal = self.memGlobalDecimal + int(self.AuxTamanioLista)
+                    self.memGlobalDecimal = self.memGlobalDecimal + int(self.AuxTamanioLista) - 1
                 elif self.AuxTipoLista == "TEXTO":
+                    self.memGlobalTexto = self.memGlobalTexto + 1
                     direccion = self.memGlobalTexto
-                    self.memGlobalTexto = self.memGlobalTexto + int(self.AuxTamanioLista)
+                    self.memGlobalTexto = self.memGlobalTexto + int(self.AuxTamanioLista) - 1
             else:
                 isClase = True
                 isGlobal = True
@@ -571,17 +570,27 @@ class misterParser ( Parser ):
         #Variables Locales
         if (self.claseActual == None and self.funcionActual != None) or (self.claseActual != None and self.funcionActual != None):
             if self.AuxTipoVar == "ENTERO":
-                direccion = self.contEnteros
-                self.contEnteros = self.contEnteros + 1
+                self.memLocalEntero = self.memLocalEntero + 1
+                direccion = self.memLocalEntero
             elif self.AuxTipoVar == "DECIMAL":
-                direccion = self.contDecimal
-                self.contDecimal = self.contDecimal + 1
+                self.memLocalDecimal = self.memLocalDecimal + 1
+                direccion = self.memLocalDecimal
             elif self.AuxTipoVar == "TEXTO":
-                direccion = self.contTexto
-                self.contTexto = self.contTexto + 1
+                self.memLocalTexto = self.memLocalTexto + 1
+                direccion = self.memLocalTexto
             elif self.AuxTipoVar == "LISTA":
-                direccion = self.contLista
-                self.contLista = self.contLista + 1
+                if self.AuxTipoLista == "ENTERO":
+                    self.memLocalEntero = self.memLocalEntero + 1
+                    direccion = self.memLocalEntero
+                    self.memLocalEntero = self.memLocalEntero + int(self.AuxTamanioLista) - 1
+                elif self.AuxTipoLista == "DECIMAL":
+                    self.memLocalDecimal = self.memLocalDecimal + 1
+                    direccion = self.memLocalDecimal
+                    self.memLocalDecimal = self.memLocalDecimal + int(self.AuxTamanioLista) - 1
+                elif self.AuxTipoLista == "TEXTO":
+                    self.memLocalTexto = self.memLocalTexto + 1
+                    direccion = self.memLocalTexto
+                    self.memLocalTexto = self.memLocalTexto + int(self.AuxTamanioLista) - 1
             else:
                 isClase = True
                 
@@ -603,37 +612,53 @@ class misterParser ( Parser ):
 
                     if dictAux[key][0] == "ENTERO":
                         if isGlobal:
-                            direccionAux = self.memGlobalEntero
                             self.memGlobalEntero = self.memGlobalEntero + 1
+                            direccionAux = self.memGlobalEntero
                         else:
-                            direccionAux = self.contEnteros
-                            self.contEnteros = self.contEnteros + 1
+                            self.memLocalEntero = self.memLocalEntero + 1
+                            direccionAux = self.memLocalEntero
                     elif dictAux[key][0] == "DECIMAL":
                         if isGlobal:
-                            direccionAux = self.memGlobalDecimal
                             self.memGlobalDecimal = self.memGlobalDecimal + 1
+                            direccionAux = self.memGlobalDecimal
                         else:
-                            direccionAux = self.contDecimal
-                            self.contDecimal = self.contDecimal + 1
+                            self.memLocalDecimal = self.memLocalDecimal + 1
+                            direccionAux = self.memLocalDecimal
                     elif dictAux[key][0] == "TEXTO":
                         if isGlobal:
-                            direccionAux = self.memGlobalTexto
                             self.memGlobalTexto = self.memGlobalTexto + 1
+                            direccionAux = self.memGlobalTexto
                         else:
-                            direccionAux = self.contTexto
-                            self.contTexto = self.contTexto + 1
+                            self.memLocalTexto = self.memLocalTexto + 1
+                            direccionAux = self.memLocalTexto
                     else:
+                        dirTipoLista = dictAux[key][0].split(",")
                         if isGlobal:
-                            dirTipoLista = dictAux[key][0].split(",")
                             if dirTipoLista[1] == "ENTERO":
+                                self.memGlobalEntero = self.memGlobalEntero + 1
                                 direccionAux = self.memGlobalEntero
-                                self.memGlobalEntero = self.memGlobalEntero + int(dirTipoLista[2])
+                                self.memGlobalEntero = self.memGlobalEntero + int(dirTipoLista[2]) - 1
                             elif dirTipoLista[1] == "DECIMAL":
+                                self.memGlobalDecimal = self.memGlobalDecimal + 1
                                 direccionAux = self.memGlobalDecimal
-                                self.memGlobalDecimal = self.memGlobalDecimal + int(dirTipoLista[2])
+                                self.memGlobalDecimal = self.memGlobalDecimal + int(dirTipoLista[2]) - 1
                             elif dirTipoLista[1] == "TEXTO":
+                                self.memGlobalTexto = self.memGlobalTexto + 1
                                 direccionAux = self.memGlobalTexto
-                                self.memGlobalTexto = self.memGlobalTexto + int(dirTipoLista[2])
+                                self.memGlobalTexto = self.memGlobalTexto + int(dirTipoLista[2]) - 1
+                        else:
+                            if dirTipoLista[1] == "ENTERO":
+                                self.memLocalEntero = self.memLocalEntero + 1
+                                direccionAux = self.memLocalEntero
+                                self.memLocalEntero = self.memLocalEntero + int(dirTipoLista[2]) - 1
+                            elif dirTipoLista[1] == "DECIMAL":
+                                self.memLocalDecimal = self.memLocalDecimal + 1
+                                direccionAux = self.memLocalDecimal
+                                self.memLocalDecimal = self.memLocalDecimal + int(dirTipoLista[2]) - 1
+                            elif dirTipoLista[1] == "TEXTO":
+                                self.memLocalTexto = self.memLocalTexto + 1
+                                direccionAux = self.memLocalTexto
+                                self.memLocalTexto = self.memLocalTexto + int(dirTipoLista[2]) - 1
                     dicAtributos[key] = [dictAux[key][0], dictAux[key][1], direccionAux]
                 NombrePadre = self.dirPrincipal[NombrePadre][2]
                 if NombrePadre == None:
@@ -666,6 +691,11 @@ class misterParser ( Parser ):
                     return
                 self.dirPrincipal[self.claseActual][1][self.funcionActual][1][self.variableActual] = [tipo, self.AuxVisVar, direccion, dicAtributos]
         self.variableActual = None
+
+    def resetDireccionLocal(self):
+        self.memLocalEntero = 8999
+        self.memLocalDecimal = 14999
+        self.memLocalTexto = 20999
 
     def checarId(self, variableId):
         if self.claseActual == None:
@@ -844,13 +874,15 @@ class misterParser ( Parser ):
             if listaAux[0].find("(") > 0:
                 listaAux[0] = listaAux[0].replace("(", "")
                 if self.claseActual == None:
-                    return self.dirPrincipal[listaAux[0]][0]
+                    if self.dirPrincipal.get(listaAux[0]):
+                        return self.dirPrincipal[listaAux[0]][0]
                 else:
                     return encontrarTipoFuncionClase(self.claseActual, listaAux[0])
             else:
                 if self.claseActual == None:
                     if self.funcionActual == None:
-                        return self.dirPrincipal["global"][3][listaAux[0]][0]
+                        if self.dirPrincipal["global"][3].get(listaAux[0]):
+                            return self.dirPrincipal["global"][3][listaAux[0]][0]
                     else:
                         auxiliar = self.dirPrincipal[self.funcionActual][3].get(listaAux[0])
                         if auxiliar != None:
@@ -863,17 +895,20 @@ class misterParser ( Parser ):
                                 return
                 else:
                     if self.funcionActual == None:
-                        return self.dirPrincipal[self.claseActual][3][listaAux[0]][0]
+                        if self.dirPrincipal[self.claseActual][3].get(listaAux[0]):
+                            return self.dirPrincipal[self.claseActual][3][listaAux[0]][0]
                     else:
                         auxiliar = self.dirPrincipal[self.claseActual][1][self.funcionActual][1].get(listaAux[0])
                         if auxiliar != None:
                             return auxiliar[0]
                         else:
-                            return self.dirPrincipal[self.claseActual][3][listaAux[0]][0]
+                            if self.dirPrincipal[self.claseActual][3].get(listaAux[0]):
+                                return self.dirPrincipal[self.claseActual][3][listaAux[0]][0]
         else:
             if self.claseActual == None:
                 if self.funcionActual == None:
-                    clase = self.dirPrincipal['global'][3][listaAux[0]][0]
+                    if self.dirPrincipal['global'][3].get(listaAux[0]):
+                        clase = self.dirPrincipal['global'][3][listaAux[0]][0]
                 else:
                     clase = self.dirPrincipal[self.funcionActual][3].get(listaAux[0])
                     if clase != None:
@@ -886,23 +921,59 @@ class misterParser ( Parser ):
                             return
             else:
                 if self.funcionActual != None:
-                    clase = self.dirPrincipal[self.claseActual][1][self.funcionActual][1][listaAux[0]][0]
+                    if self.dirPrincipal[self.claseActual][1][self.funcionActual][1].get(listaAux[0]):
+                        clase = self.dirPrincipal[self.claseActual][1][self.funcionActual][1][listaAux[0]][0]
 
             if listaAux[1].find("(") > 0:
                 return self.encontrarTipoFuncionClase(clase, listaAux[1].replace("(", ""))
             else:
                 return self.encontrarTipoAtributoClase(clase, listaAux[1])
 
-    def encontrarDireccionAtributoClase(self, padre, atributo):
+    def encontrarDireccionFuncionClase(self, padre, funcion):
         while True:
-            dictAux = self.dirPrincipal[padre][3]
-            value = dictAux.get(atributo)
+            dictAux = self.dirPrincipal[padre][1]
+            value = dictAux.get(funcion)
             if value != None:
-                return value[2]
+                return value[4]
             padre = self.dirPrincipal[padre][2]
             if padre == None:
                 break
         return
+
+    def obtenerDireccionFuncion(self, stringFuncion):
+        if stringFuncion == None:
+            return None
+        listaAux = stringFuncion.split(".")
+        if len(listaAux) == 1:
+            if listaAux[0].find("(") > 0:
+                listaAux[0] = listaAux[0].replace("(", "")
+                if self.claseActual == None:
+                    if self.dirPrincipal.get(listaAux[0]):
+                        return self.dirPrincipal[listaAux[0]][6]
+                else:
+                    return encontrarDireccionFuncionClase(self.claseActual, listaAux[0])
+        else:
+            if self.claseActual == None:
+                if self.funcionActual == None:
+                    if self.dirPrincipal['global'][3].get(listaAux[0]):
+                        clase = self.dirPrincipal['global'][3][listaAux[0]][0]
+                else:
+                    clase = self.dirPrincipal[self.funcionActual][3].get(listaAux[0])
+                    if clase != None:
+                        clase = clase[0]
+                    else:
+                        clase = self.dirPrincipal['global'][3].get(listaAux[0])
+                        if clase != None:
+                            clase = clase[0]
+                        else:
+                            return
+            else:
+                if self.funcionActual != None:
+                    if self.dirPrincipal[self.claseActual][1][self.funcionActual][1].get(listaAux[0]):
+                        clase = self.dirPrincipal[self.claseActual][1][self.funcionActual][1][listaAux[0]][0]
+
+            if listaAux[1].find("(") > 0:
+                return self.encontrarDireccionFuncionClase(clase, listaAux[1].replace("(", ""))
 
     def obtenerDireccionVariable(self, stringVariable):
         if stringVariable == None:
@@ -914,7 +985,8 @@ class misterParser ( Parser ):
             else:
                 if self.claseActual == None:
                     if self.funcionActual == None:
-                        return self.dirPrincipal["global"][3][listaAux[0]][1]
+                        if self.dirPrincipal["global"][3].get(listaAux[0]):
+                            return self.dirPrincipal["global"][3][listaAux[0]][1]
                     else:
                         auxiliar = self.dirPrincipal[self.funcionActual][3].get(listaAux[0])
                         if auxiliar != None:
@@ -927,31 +999,81 @@ class misterParser ( Parser ):
                                 return
                 else:
                     if self.funcionActual == None:
-                        return self.dirPrincipal[self.claseActual][3][listaAux[0]][2]
+                        if self.dirPrincipal[self.claseActual][3].get(listaAux[0]):
+                            return self.dirPrincipal[self.claseActual][3][listaAux[0]][2]
                     else:
                         auxiliar = self.dirPrincipal[self.claseActual][1][self.funcionActual][1].get(listaAux[0])
                         if auxiliar != None:
                             return auxiliar[2]
                         else:
-                            return self.dirPrincipal[self.claseActual][3][listaAux[0]][2]
+                            if self.dirPrincipal[self.claseActual][3].get(listaAux[0]):
+                                return self.dirPrincipal[self.claseActual][3][listaAux[0]][2]
+        else:
+            if listaAux[1].find("(") > 0:
+                return None
+
+            if self.claseActual == None:
+                if self.funcionActual == None:
+                    if (self.dirPrincipal['global'][3].get(listaAux[0])) and (self.dirPrincipal['global'][3][listaAux[0]][2].get(listaAux[1])):
+                        return self.dirPrincipal['global'][3][listaAux[0]][2][listaAux[1]][2]
+                else:
+                    clase = self.dirPrincipal[self.funcionActual][3].get(listaAux[0])
+                    if clase != None:
+                        if clase[2].get(listaAux[1]):
+                            return clase[2][listaAux[1]][2]
+                    else:
+                        if (self.dirPrincipal['global'][3].get(listaAux[0])) and (self.dirPrincipal['global'][3][listaAux[0]][2].get(listaAux[1])):
+                            return self.dirPrincipal['global'][3][listaAux[0]][2][listaAux[1]][2]
+            else:
+                if self.funcionActual != None:
+                    if (self.dirPrincipal[self.claseActual][1][self.funcionActual][1].get(listaAux[0])) and (self.dirPrincipal[self.claseActual][1][self.funcionActual][1][listaAux[0]][3].get(listaAux[1])):
+                        return self.dirPrincipal[self.claseActual][1][self.funcionActual][1][listaAux[0]][3][listaAux[1]][2]
+
+    def encontrarTamanioFuncionClase(self, padre, funcion):
+        while True:
+            dictAux = self.dirPrincipal[padre][1]
+            value = dictAux.get(funcion)
+            if value != None:
+                return value[5]
+            padre = self.dirPrincipal[padre][2]
+            if padre == None:
+                break
+        return
+
+    def obtenerTamanioFuncion(self, stringFuncion):
+        if stringFuncion == None:
+            return None
+        listaAux = stringFuncion.split(".")
+        if len(listaAux) == 1:
+            if listaAux[0].find("(") > 0:
+                listaAux[0] = listaAux[0].replace("(", "")
+                if self.claseActual == None:
+                    if self.dirPrincipal.get(listaAux[0]):
+                        return self.dirPrincipal[listaAux[0]][7]
+                else:
+                    return encontrarTamanioFuncionClase(self.claseActual, listaAux[0])
         else:
             if self.claseActual == None:
                 if self.funcionActual == None:
-                    clase = self.dirPrincipal['global'][3][listaAux[0]][0]
+                    if self.dirPrincipal['global'][3].get(listaAux[0]):
+                        clase = self.dirPrincipal['global'][3][listaAux[0]][0]
                 else:
                     clase = self.dirPrincipal[self.funcionActual][3].get(listaAux[0])
                     if clase != None:
                         clase = clase[0]
                     else:
-                        clase = self.dirPrincipal['global'][3][listaAux[0]][0]
+                        clase = self.dirPrincipal['global'][3].get(listaAux[0])
+                        if clase != None:
+                            clase = clase[0]
+                        else:
+                            return
             else:
                 if self.funcionActual != None:
-                    clase = self.dirPrincipal[self.claseActual][1][self.funcionActual][1][listaAux[0]][0]
+                    if self.dirPrincipal[self.claseActual][1][self.funcionActual][1].get(listaAux[0]):
+                        clase = self.dirPrincipal[self.claseActual][1][self.funcionActual][1][listaAux[0]][0]
 
             if listaAux[1].find("(") > 0:
-                return None
-            else:
-                return self.encontrarDireccionAtributoClase(clase, listaAux[1])
+                return self.encontrarTamanioFuncionClase(clase, listaAux[1].replace("(", ""))
 
     def encontrarParametrosFuncionClase(self, padre, funcion):
         while True:
@@ -972,13 +1094,15 @@ class misterParser ( Parser ):
             if listaAux[0].find("(") > 0:
                 listaAux[0] = listaAux[0].replace("(", "")
                 if self.claseActual == None:
-                    return self.dirPrincipal[listaAux[0]][5]
+                    if self.dirPrincipal.get(listaAux[0]):
+                        return self.dirPrincipal[listaAux[0]][5]
                 else:
                     return encontrarParametrosFuncionClase(self.claseActual, listaAux[0])
         else:
             if self.claseActual == None:
                 if self.funcionActual == None:
-                    clase = self.dirPrincipal['global'][3][listaAux[0]][0]
+                    if self.dirPrincipal['global'][3].get(listaAux[0]):
+                        clase = self.dirPrincipal['global'][3][listaAux[0]][0]
                 else:
                     clase = self.dirPrincipal[self.funcionActual][3].get(listaAux[0])
                     if clase != None:
@@ -990,7 +1114,8 @@ class misterParser ( Parser ):
                         clase = clase[0]
             else:
                 if self.funcionActual != None:
-                    clase = self.dirPrincipal[self.claseActual][1][self.funcionActual][1][listaAux[0]][0]
+                    if self.dirPrincipal[self.claseActual][1][self.funcionActual][1].get(listaAux[0]):
+                        clase = self.dirPrincipal[self.claseActual][1][self.funcionActual][1][listaAux[0]][0]
 
             if listaAux[1].find("(") > 0:
                 return self.encontrarParametrosFuncionClase(clase, listaAux[1].replace("(", ""))
@@ -1039,6 +1164,7 @@ class misterParser ( Parser ):
 
     def crearCuadruploExpresion(self,op,tipoCuadruplo):
         #OP = 0 - mult,div 1 - suma,resta 2 - relacionales 3 - logicos 4 - asignacion
+        auxDireccion = 0
         if self.pOper:
             oper = self.pOper.pop()
             if oper in self.quadOperadores[op]:
@@ -1051,9 +1177,17 @@ class misterParser ( Parser ):
                         res = self.cuboSem.checarSemanticaExp(oIzqTipo,oDerTipo,oper)
                         if res != None:
                             if tipoCuadruplo == 'exp':
-                                self.quadList.append([oper,oIzq,oDer,"t" + str(self.contQuadTemporales)])
-                                self.insertarValorTipo("t" + str(self.contQuadTemporales),res)
-                                self.contQuadTemporales = self.contQuadTemporales + 1
+                                if res == "ENTERO":
+                                    self.memLocalEntero = self.memLocalEntero + 1
+                                    auxDireccion = self.memLocalEntero
+                                elif res == "DECIMAL":
+                                    self.memLocalDecimal = self.memLocalDecimal + 1
+                                    auxDireccion = self.memLocalDecimal
+                                elif res == "TEXTO":
+                                    self.memLocalTexto = self.memLocalTexto + 1
+                                    auxDireccion = self.memLocalTexto
+                                self.quadList.append([oper,oIzq,oDer,auxDireccion])
+                                self.insertarValorTipo(auxDireccion,res)
                             elif tipoCuadruplo == 'asignacion':
                                 self.quadList.append([oper,oDer,None,oIzq])
                         else:
@@ -1112,14 +1246,16 @@ class misterParser ( Parser ):
         self.quadList[falso][3] = str(cont)
 
     def crearCuadruploEra(self, nombreFuncion):
-        self.quadList.append(['ERA',None,None,nombreFuncion])
+        tamAux = self.obtenerTamanioFuncion(nombreFuncion)
+        self.quadList.append(['ERA',None,None,tamAux])
 
     def crearCuadruploParam(self):
         elemento = self.pilaO[len(self.pilaO) -1]
         self.quadList.append(['PARAM',None,None,elemento])
 
     def crearCuadruploGosub(self, nombreFuncion):
-        self.quadList.append(['GOSUB',None,None,nombreFuncion])
+        dirAux = self.obtenerDireccionFuncion(nombreFuncion)
+        self.quadList.append(['GOSUB',None,None,dirAux])
 
     def crearCuadruploTerminarProc(self):
         self.quadList.append([self.terminacionProc,None,None,None])
@@ -1129,14 +1265,27 @@ class misterParser ( Parser ):
 
     def completarCuadruploInicial(self):
         cont = len(self.quadList)
-        self.quadList[0][3] = str(cont)
+        self.quadList[0][3] = cont
 
     def asignarDirInicioFuncion(self, nombreFuncion):
         cont = len(self.quadList)
         if self.claseActual == None:
-            self.dirPrincipal[nombreFuncion][6] = str(cont)
+            if self.dirPrincipal.get(nombreFuncion):
+                self.dirPrincipal[nombreFuncion][6] = cont
         else:
-            self.dirPrincipal[self.claseActual][1][nombreFuncion][4] = str(cont)
+            if self.dirPrincipal[self.claseActual][1].get(nombreFuncion):
+                self.dirPrincipal[self.claseActual][1][nombreFuncion][4] = cont
+
+    def asignarTamanioFuncion(self):
+        contEntero = self.memLocalEntero - 8999
+        contDecimal = self.memLocalDecimal - 14999
+        contTexto = self.memLocalTexto - 20999
+        if self.claseActual == None:
+            if self.dirPrincipal.get(self.funcionActual):
+                self.dirPrincipal[self.funcionActual][7] = [contEntero,contDecimal,contTexto]
+        else:
+            if self.dirPrincipal[self.claseActual][1].get(self.funcionActual):
+                self.dirPrincipal[self.claseActual][1][self.funcionActual][5] = [contEntero,contDecimal,contTexto]
 
     def checarOrdenParametros(self):
         if len(self.stackParametros) == 0 or len(self.pTipos) == 0 or len(self.stackContParametros) == 0 :
@@ -1167,12 +1316,15 @@ class misterParser ( Parser ):
             print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Se espera un valor de retorno de tipo " + self.RetornoTipo )
 
     def checarLongitudParametros(self):
-        if len(self.obtenerParametros(self.stackParametros[len(self.stackParametros) - 1])) != self.stackContParametros[len(self.stackContParametros)-1]:
-            print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " La cantidad de parametros es incorrecta" )
-            self._syntaxErrors = self._syntaxErrors + 1
-            return
-        self.stackParametros.pop()
-        self.stackContParametros.pop()
+        if self.stackParametros:
+            resObtenerParam = self.obtenerParametros(self.stackParametros[len(self.stackParametros) - 1])
+            if resObtenerParam:
+                if len(resObtenerParam) != self.stackContParametros[len(self.stackContParametros)-1]:
+                    print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " La cantidad de parametros es incorrecta" )
+                    self._syntaxErrors = self._syntaxErrors + 1
+                    return
+                self.stackParametros.pop()
+                self.stackContParametros.pop()
 
     def programa(self):
 
@@ -1768,8 +1920,10 @@ class misterParser ( Parser ):
                 self.enterOuterAlt(localctx, 1)
                 self.state = 192
                 self.match(misterParser.IGUAL)
+                self.insertarOperador('=')
                 self.state = 193
                 self.varsAux3()
+                self.crearCuadruploExpresion(4,'asignacion')
 
             elif token in [misterParser.COMA, misterParser.PUNTOYCOMA]:
                 self.enterOuterAlt(localctx, 2)
@@ -1881,8 +2035,13 @@ class misterParser ( Parser ):
             self.enterOuterAlt(localctx, 1)
             self.state = 201
             self.variableActual = self.getCurrentToken().text
-            self.insertarVariable()
             self.match(misterParser.ID)
+            auxVariableActual = self.variableActual
+            self.insertarVariable()
+            self.checarId(auxVariableActual)
+            self.tipoOperando = self.obtenerTipo(auxVariableActual)
+            auxDir = self.obtenerDireccionVariable(auxVariableActual)
+            self.insertarValorTipo(auxDir,self.tipoOperando)
             self.state = 202
             self.varsAux2()
             self.state = 203
@@ -1944,8 +2103,13 @@ class misterParser ( Parser ):
                 self.match(misterParser.COMA)
                 self.state = 206
                 self.variableActual = self.getCurrentToken().text
-                self.insertarVariable()
                 self.match(misterParser.ID)
+                auxVariableActual = self.variableActual
+                self.insertarVariable()
+                self.checarId(auxVariableActual)
+                self.tipoOperando = self.obtenerTipo(auxVariableActual)
+                auxDir = self.obtenerDireccionVariable(auxVariableActual)
+                self.insertarValorTipo(auxDir,self.tipoOperando)
                 self.state = 207
                 self.varsAux2()
                 self.state = 208
@@ -2339,7 +2503,7 @@ class misterParser ( Parser ):
                 self.tipoOperando = 'ENTERO'
                 self.operando = self.getCurrentToken().text
                 self.match(misterParser.CTENTERO)
-                self.insertarValorTipo(self.operando, self.tipoOperando)
+                self.insertarValorTipo([self.operando], self.tipoOperando)
 
             elif token in [misterParser.CTEDECIMAL]:
                 self.enterOuterAlt(localctx, 2)
@@ -2347,7 +2511,7 @@ class misterParser ( Parser ):
                 self.tipoOperando = 'DECIMAL'
                 self.operando = self.getCurrentToken().text
                 self.match(misterParser.CTEDECIMAL)
-                self.insertarValorTipo(self.operando, self.tipoOperando)
+                self.insertarValorTipo([self.operando], self.tipoOperando)
 
             elif token in [misterParser.ID]:
                 self.enterOuterAlt(localctx, 3)
@@ -2365,7 +2529,7 @@ class misterParser ( Parser ):
                 tipoOperando = 'TEXTO'
                 self.operando = self.getCurrentToken().text
                 self.match(misterParser.CTETEXTO)
-                self.insertarValorTipo(self.operando, self.tipoOperando)
+                self.insertarValorTipo([self.operando], self.tipoOperando)
 
             else:
                 raise NoViableAltException(self)
@@ -2749,12 +2913,14 @@ class misterParser ( Parser ):
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 273
+            self.resetDireccionLocal()
             self.parametros()
             self.state = 274
             self.match(misterParser.LLAVE1)
             self.state = 275
             self.funcAux1()
             self.state = 276
+            self.asignarTamanioFuncion()
             self.funcAux2()
             self.state = 277
             self.funcAux3()
@@ -3531,7 +3697,7 @@ class misterParser ( Parser ):
             elif self.semanticaCompuestoAux != None:
                 self.stackParametros.append(self.semanticaCompuestoAux + "(")
                 self.stackContParametros.append(0)
-            self.crearCuadruploEra(self.semanticaCompuestoAux)
+            self.crearCuadruploEra(self.stackParametros[len(self.stackParametros) - 1])
             self.state = 346
             self.llamarFuncAux1()
             self.state = 347
@@ -5275,7 +5441,9 @@ class misterParser ( Parser ):
             self.metodAux2()
             self.state = 505
             self.insertarFunc()
+            self.asignarDirInicioFuncion(self.funcionActual)
             self.match(misterParser.ID)
+            self.terminacionProc = 'ENDPROC'
             self.state = 506
             self.func()
             self.state = 507
