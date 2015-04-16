@@ -13,7 +13,14 @@ FUNCION ENTERO INICIO (ENTERO parametro1 , DECIMAL parametro2) {
 			ASIGNAR num1 = num1 + 1;
 		}
 	}
-	IMPRIMIR(num1);	
+	IMPRIMIR(num1);
+	
+	SI("a" > "b") {
+		IMPRIMIR("a mayor que b");
+	} SINO {
+		IMPRIMIR("b mayor que a");
+	}
+	
 	RETORNAR 0;
 
 }
