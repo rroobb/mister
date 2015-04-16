@@ -10,7 +10,9 @@ class maquinaVirtual:
 
 	memoria = [[[],[],[]],[[],[],[]]]
 
-	stackComienzoFunciones = []
+	stackComienzoFunciones = [] #[INt, decimal , texto]
+
+	stackCantidadEspacio = []  #[INt, decimal , texto]
 
 	def __init__(self, dirPrincipal:dict, cuadruplos:list, contGlobalInt:int, contGlobalDecimal:int, contGlobalTexto:int, contInicioInt:int, contInicioDecimal:int, contInicioTexto:int):
 		self.dirPrincipal = dirPrincipal
@@ -148,6 +150,18 @@ class maquinaVirtual:
 		indexs = self.obtenerDireccion(self.cuadruplos[self.InstruccionIndex][1])
 		if self.memoria[indexs[0]][indexs[1]][indexs[2]] == 0:
 			self.InstruccionIndex = self.cuadruplos[self.InstruccionIndex][3] - 1
+
+
+
+ERA, null, null, [contEnteros,contDecimales,contTextos]
+
+PARAM,null,null,elemento
+
+GOSUB,null,null,direccionInicioFuncion
+
+[ENDPROC, None, None, None]
+
+[END, None, None, None]
 
 	def empezar(self):
 		while (self.cuadruplos[self.InstruccionIndex[0]] != "END"):
