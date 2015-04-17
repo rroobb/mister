@@ -16,6 +16,11 @@ class maquinaVirtual:
 
 	stackPorReferenciaFunciones = [] #cada elemento[[direccion, direccion], ...]
 
+	contLocalInt = 0
+
+	contLocalDecimal = 0
+
+	contLocalTexto = 0
 	def __init__(self, dirPrincipal:dict, cuadruplos:list, contGlobalInt:int, contGlobalDecimal:int, contGlobalTexto:int, contInicioInt:int, contInicioDecimal:int, contInicioTexto:int):
 		self.dirPrincipal = dirPrincipal
 		self.cuadruplos = cuadruplos
@@ -138,15 +143,19 @@ class maquinaVirtual:
 	def leer(self):
 		indexs = self.obtenerDireccion(self.cuadruplos[self.InstruccionIndex][3])
 		if indexs[1] == 0:
-			try:
-				self.memoria[indexs[0]][indexs[1]][indexs[2]] = int(input('Escribe tu entrada:'))
-			except ValueError:
-				print("Numero Invalido")
+			while True:
+				try:
+					self.memoria[indexs[0]][indexs[1]][indexs[2]] = int(input('Escribe tu entrada:'))
+					break
+				except ValueError:
+					print("Numero Invalido, Intente nuevamente")
 		elif indexs[1] == 1:
-			try:
-				self.memoria[indexs[0]][indexs[1]][indexs[2]] = float(input('Escribe tu entrada:'))
-			except ValueError:
-				print("Numero invalido")
+			while True:
+				try:
+					self.memoria[indexs[0]][indexs[1]][indexs[2]] = float(input('Escribe tu entrada:'))
+					break
+				except ValueError:
+					print("Numero invalido, Intente nuevamente")
 		elif indexs[1] == 2:
 			self.memoria[indexs[0]][indexs[1]][indexs[2]] = input('Escribe tu entrada:')
 
@@ -165,7 +174,22 @@ class maquinaVirtual:
 			aux1 = self.cuadruplos[self.InstruccionIndex][1][0]	
 
 		indexs = self.obtenerDireccion(self.cuadruplos[self.InstruccionIndex][3])
-		self.memoria[indexs[0]][indexs[1]][indexs[2]] = aux1
+		if indexs[1] == 0:
+			try:
+				self.memoria[indexs[0]][indexs[1]][indexs[2]] = int(aux1)
+			except ValueError:
+				print("Numero invalido, no se pudo completar la asignacion")
+		elif indexs[1] == 1:
+			try:
+				self.memoria[indexs[0]][indexs[1]][indexs[2]] = float(aux1)
+			except ValueError:
+				print("Numero invalido, no se pudo completar la asignacion")
+		else:
+			self.memoria[indexs[0]][indexs[1]][indexs[2]] = str(aux1)
+
+	def era(self):
+		aux = self.cuadruplos[self.InstruccionIndex][3]
+		self.stackCantidadEspacio.append(aux)
 
 
 #ERA, null, null, [contEnteros,contDecimales,contTextos]
