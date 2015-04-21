@@ -2660,17 +2660,17 @@ class misterParser ( Parser ):
                 self.compuesto()
                 self.state = 241
                 self.valorAux1()
-                semanticaCompuestoAux = None
-                semanticaCompuestoAux2 = None
+                self.semanticaCompuestoAux = None
+                self.semanticaCompuestoAux2 = None
 
 
             elif token in [misterParser.CTETEXTO]:
                 self.enterOuterAlt(localctx, 4)
                 self.state = 243
-                tipoOperando = 'TEXTO'
+                self.tipoOperando = 'TEXTO'
                 self.operando = self.getCurrentToken().text
                 self.match(misterParser.CTETEXTO)
-                self.insertarValorTipo([self.operando], self.tipoOperando)
+                self.insertarValorTipo([self.operando.replace('"', "")], self.tipoOperando)
 
             else:
                 raise NoViableAltException(self)
