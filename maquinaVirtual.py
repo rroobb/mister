@@ -261,8 +261,6 @@ class maquinaVirtual:
 
 #PARAM, true/false referencia, DirFuncionLocal, DirLLamada/[constante]
 
-#Retornar: =, valor/dir, None, DirDestino
-
 #GOSUB,null,null,direccionInicioFuncion
 
 #[ENDPROC, None, None, None]

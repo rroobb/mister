@@ -7,8 +7,8 @@ FUNCION ENTERO INICIO (ENTERO parametro1 , DECIMAL parametro2) {
 	ENTERO num1 = 5;
 	ENTERO num2 = 4;
 	ASIGNAR num1 = num1 + num2;
-	LEER(num2);
-	ASIGNAR x = AREA(-3.0,5.0);
+	ASIGNAR x = AREA(AREA(-3.0,4.0),5.0);
+	IMPRIMIR(x);
 	RETORNAR 0;
 
 }
