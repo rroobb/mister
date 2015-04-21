@@ -258,7 +258,7 @@ class maquinaVirtual:
 			self.memoria[indexs2[0]][indexs2[1]][indexs2[2]- self.stackCantidadEspacio[len(self.stackCantidadEspacio) - 2][indexs2[1]]] = aux1
 
 	def guardarDirRetornar(self):
-		print("hola")
+		#print("hola")
 		self.stackRetornos.append(self.cuadruplos[self.InstruccionIndex][3])
 #ERA, null, null, [contEnteros,contDecimales,contTextos]
 
