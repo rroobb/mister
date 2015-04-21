@@ -1,7 +1,5 @@
 
-
-FUNCION ENTERO INICIO (ENTERO parametro1 , DECIMAL parametro2) {
-
+FUNCION NADA print (TEXTO param1, ENTERO parametro1 , DECIMAL parametro2, TEXTO p){
 	ENTERO num1 = 5;
 	ENTERO num2 = 4;
 	DECIMAL num3;
@@ -14,8 +12,34 @@ FUNCION ENTERO INICIO (ENTERO parametro1 , DECIMAL parametro2) {
 			ASIGNAR num1 = num1 + 1;
 		}
 	}
-	ASIGNAR num1 = "12.34";
 	IMPRIMIR(num1);
+	IMPRIMIR(param1);
+	IMPRIMIR(parametro1);
+	IMPRIMIR(parametro2);
+	ASIGNAR parametro1 = -2;
+	ASIGNAR p = "ADIOS";
+	
+}
+FUNCION ENTERO INICIO (ENTERO parametro1 , DECIMAL parametro2) {
+
+	ENTERO num1 = 5;
+	ENTERO num2 = 4;
+	TEXTO p = "hola";
+	DECIMAL num3;
+	ASIGNAR num1 = 1;
+	MIENTRAS (num1 < 10){
+		SI (num1 > 5){
+			ASIGNAR num1 = 20;	
+		}
+		SINO{
+			ASIGNAR num1 = num1 + 1;
+		}
+	}
+	IMPRIMIR(num2);
+	ASIGNAR num3 = 5.342;
+	print("hola", &num2, num3, &p);
+	IMPRIMIR(num2);
+	IMPRIMIR(p);
 	SI("a" > "b") {
 		IMPRIMIR("a mayor que b");
 	} SINO {
