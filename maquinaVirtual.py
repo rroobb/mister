@@ -16,6 +16,8 @@ class maquinaVirtual:
 
 	stackDireccionesFunciones = []
 
+	stackRetornos = []
+
 	contLocalInt = 0
 
 	contLocalDecimal = 0
@@ -242,10 +244,18 @@ class maquinaVirtual:
 			self.contLocalTexto = self.contLocalTexto - aux[2]
 
 	def retornar(self):
-		indexs1 = self.obtenerDireccion(self.cuadruplos[self.InstruccionIndex][1])
-		indexs2 = self.obtenerDireccion(self.cuadruplos[self.InstruccionIndex][3])
-		self.memoria[indexs2[0]][indexs2[1]][indexs2[2]- self.stackCantidadEspacio[len(self.stackCantidadEspacio) - 2][indexs2[1]]] = self.memoria[indexs1[0]][indexs1[1]][indexs1[2]]
+		aux1 = None
+		if type(self.cuadruplos[self.InstruccionIndex][3]) is int:
+			indexs = self.obtenerDireccion(self.cuadruplos[self.InstruccionIndex][3])
+			aux1 = self.memoria[indexs[0]][indexs[1]][indexs[2]]
 
+		elif type(self.cuadruplos[self.InstruccionIndex][3]) is list:
+			aux1 = self.cuadruplos[self.InstruccionIndex][3][0]	
+		indexs2 = self.obtenerDireccion(self.stackRetornos.pop())
+		self.memoria[indexs2[0]][indexs2[1]][indexs2[2]- self.stackCantidadEspacio[len(self.stackCantidadEspacio) - 2][indexs2[1]]] = aux1
+
+	def guardarDirRetornar(self):
+		self.stackRetornos.append(self.cuadruplos[self.InstruccionIndex][3])
 #ERA, null, null, [contEnteros,contDecimales,contTextos]
 
 #PARAM, true/false referencia, DirFuncionLocal, DirLLamada/[constante]
