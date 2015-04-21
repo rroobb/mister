@@ -532,6 +532,7 @@ class misterParser ( Parser ):
         if self.dirPrincipal.get(self.funcionActual) != None:
             print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Funcion ya existente" )
             self._syntaxErrors = self._syntaxErrors + 1
+            sys.exit()
             return
         if self.claseActual == None:
             self.dirPrincipal[self.funcionActual] = [self.AuxTipo, None, None, {}, [0,0,0,0], [], None, [0,0,0]]
@@ -543,6 +544,7 @@ class misterParser ( Parser ):
         if self.dirPrincipal.get(self.claseActual) != None:
             print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Clase ya existente" )
             self._syntaxErrors = self._syntaxErrors + 1
+            sys.exit()
             return
         self.dirPrincipal[self.claseActual] = [None, {}, self.AuxPadre, {}, None, None, None, [0,0,0]]
         self.AuxPadre = None
@@ -683,12 +685,14 @@ class misterParser ( Parser ):
                 if self.dirPrincipal['global'][3].get(self.variableActual) != None:
                     print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Variable ya existente" )
                     self._syntaxErrors = self._syntaxErrors + 1
+                    sys.exit()
                     return
                 self.dirPrincipal['global'][3][self.variableActual] = [tipo, direccion, dicAtributos]
             else:
                 if self.dirPrincipal[self.funcionActual][3].get(self.variableActual) != None:
                     print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Variable ya existente" )
                     self._syntaxErrors = self._syntaxErrors + 1
+                    sys.exit()
                     return
                 self.dirPrincipal[self.funcionActual][3][self.variableActual] = [tipo, direccion, dicAtributos]
         else:
@@ -696,12 +700,14 @@ class misterParser ( Parser ):
                 if self.dirPrincipal[self.claseActual][3].get(self.variableActual) != None:
                     print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Variable ya existente" )
                     self._syntaxErrors = self._syntaxErrors + 1
+                    sys.exit()
                     return
                 self.dirPrincipal[self.claseActual][3][self.variableActual] = [tipo, self.AuxVisVar, direccion, dicAtributos]
             else:
                 if self.dirPrincipal[self.claseActual][1][self.funcionActual][1].get(self.variableActual) != None:
                     print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Variable ya existente" )
                     self._syntaxErrors = self._syntaxErrors + 1
+                    sys.exit()
                     return
                 self.dirPrincipal[self.claseActual][1][self.funcionActual][1][self.variableActual] = [tipo, self.AuxVisVar, direccion, dicAtributos]
         self.variableActual = None
@@ -717,12 +723,14 @@ class misterParser ( Parser ):
                 if self.dirPrincipal['global'][3].get(variableId) == None:
                     print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Variable no declarada" )
                     self._syntaxErrors = self._syntaxErrors + 1
+                    sys.exit()
                     return
             else:
                 if self.dirPrincipal[self.funcionActual][3].get(variableId) == None:
                     if self.dirPrincipal['global'][3].get(variableId) == None:
                         print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Variable no declarada" )
                         self._syntaxErrors = self._syntaxErrors + 1
+                        sys.exit()
                         return
         else:
             if self.funcionActual != None:
@@ -730,6 +738,7 @@ class misterParser ( Parser ):
                     if self.dirPrincipal[self.claseActual][3].get(variableId) == None:
                         print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Variable no declarada" )
                         self._syntaxErrors = self._syntaxErrors + 1
+                        sys.exit()
                         return
 
     def checarAtributo(self, atributoId):
@@ -740,16 +749,19 @@ class misterParser ( Parser ):
                 if varAtributos == None:
                     print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Variable no declarada" )
                     self._syntaxErrors = self._syntaxErrors + 1
+                    sys.exit()
                     return
                 varAtributos = varAtributos[2].get(atributoId)
                 if varAtributos != None:
                     if varAtributos[1] == 'PRIVADO':
                         print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " No se puede acceder al atributo" )
                         self._syntaxErrors = self._syntaxErrors + 1
+                        sys.exit()
                         return
                 else:
                     print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Atributo no declarado" )
                     self._syntaxErrors = self._syntaxErrors + 1
+                    sys.exit()
                     return
 
             else:
@@ -759,17 +771,20 @@ class misterParser ( Parser ):
                     if varAtributos == None:
                         print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Variable no declarada" )
                         self._syntaxErrors = self._syntaxErrors + 1
+                        sys.exit()
                         return
                 varAtributos = varAtributos[2].get(atributoId)
                 if varAtributos != None:
                     if varAtributos[1] == 'PRIVADO':
                         print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " No se puede acceder al atributo" )
                         self._syntaxErrors = self._syntaxErrors + 1
+                        sys.exit()
                         return
                 
                 else:
                     print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Atributo no declarado" )
                     self._syntaxErrors = self._syntaxErrors + 1
+                    sys.exit()
                     return
 
         else:
@@ -778,16 +793,19 @@ class misterParser ( Parser ):
                 if varAtributos == None:
                     print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Variable no declarada" )
                     self._syntaxErrors = self._syntaxErrors + 1
+                    sys.exit()
                     return
                 varAtributos = varAtributos[3].get(atributoId)
                 if varAtributos != None:
                     if varAtributos[1] == 'PRIVADO':
                         print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " No se puede acceder al atributo" )
                         self._syntaxErrors = self._syntaxErrors + 1
+                        sys.exit()
                         return
                 else:
                     print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Atributo no declarado" )
                     self._syntaxErrors = self._syntaxErrors + 1
+                    sys.exit()
                     return
 
     def checarMetodo(self):
@@ -796,6 +814,7 @@ class misterParser ( Parser ):
                 if self.dirPrincipal.get(self.semanticaCompuestoAux) == None:
                     print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Funcion no declarada" )
                     self._syntaxErrors = self._syntaxErrors + 1
+                    sys.exit()
                     return
             else:
                 self.encontrarFuncionClase(self.claseActual)
@@ -808,6 +827,7 @@ class misterParser ( Parser ):
                     if tipo == None:
                         print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Variable no declarada" )
                         self._syntaxErrors = self._syntaxErrors + 1
+                        sys.exit()
                         return
                     tipo = tipo[0]
                     
@@ -818,6 +838,7 @@ class misterParser ( Parser ):
                         if tipo == None:
                             print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Variable no declarada" )
                             self._syntaxErrors = self._syntaxErrors + 1
+                            sys.exit()
                             return
                     tipo = tipo[0]
             
@@ -827,6 +848,7 @@ class misterParser ( Parser ):
                     if tipo == None:
                         print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Variable no declarada" )
                         self._syntaxErrors = self._syntaxErrors + 1
+                        sys.exit()
                         return
                     tipo = tipo[0]
 
@@ -835,6 +857,7 @@ class misterParser ( Parser ):
                     if tipo == None:
                         print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Variable no declarada" )
                         self._syntaxErrors = self._syntaxErrors + 1
+                        sys.exit()
                         return
                     tipo = tipo[0]
                     
@@ -844,6 +867,7 @@ class misterParser ( Parser ):
         if padre in ['ENTERO','DECIMAL','TEXTO','NADA', 'LISTA']:
             print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " No se puede acceder al metodo" )
             self._syntaxErrors = self._syntaxErrors + 1
+            sys.exit()
             return
         
         while True:
@@ -856,6 +880,7 @@ class misterParser ( Parser ):
                 break
         print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Funcion no declarada" )
         self._syntaxErrors = self._syntaxErrors + 1
+        sys.exit()
         return
 
     def encontrarTipoFuncionClase(self, padre, funcion):
@@ -1292,6 +1317,7 @@ class misterParser ( Parser ):
                         else:
                             print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Tipos de operandos no compatibles" )
                             self._syntaxErrors = self._syntaxErrors + 1
+                            sys.exit()
                             return
                     else:
                         self.pilaO.append(oDer)
@@ -1315,6 +1341,7 @@ class misterParser ( Parser ):
         if tipoCondicion != 'ENTERO':
             print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Tipo de operando no compatible" )
             self._syntaxErrors = self._syntaxErrors + 1
+            sys.exit()
             return
         else:
             self.quadList.append(['gotof',condicion,None,None])
@@ -1397,6 +1424,7 @@ class misterParser ( Parser ):
             print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " La cantidad de parametros es incorrecta" )
             self._syntaxErrors = self._syntaxErrors + 1
             self.stackContParametros[len(self.stackContParametros)-1] = self.stackContParametros[len(self.stackContParametros)-1] + 1
+            sys.exit()
             return
         tipoParametro = listaPar[cont].split(',')
         tipoLlamada = self.pTipos[len(self.pTipos)-1].split(',')
@@ -1414,12 +1442,18 @@ class misterParser ( Parser ):
     def validarTipoRetorno(self):
         if self.RetornoTipo == "NADA":
             print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " No se espera un valor de retorno" )
+            self._syntaxErrors = self._syntaxErrors + 1
+            sys.exit()
         elif self.RetornoTipo != self.pTipos[len(self.stackParametros) - 1]:
             print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Se espera un valor de retorno de tipo " + self.RetornoTipo )
-    
+            self._syntaxErrors = self._syntaxErrors + 1
+            sys.exit()
+
     def validarNoRetorno(self):
         if self.RetornoTipo != "NADA":
             print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Se espera un valor de retorno de tipo " + self.RetornoTipo )
+            self._syntaxErrors = self._syntaxErrors + 1
+            sys.exit()
 
     def checarLongitudParametros(self):
         if self.stackParametros:
@@ -1428,6 +1462,7 @@ class misterParser ( Parser ):
                 if len(resObtenerParam) != self.stackContParametros[len(self.stackContParametros)-1]:
                     print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " La cantidad de parametros es incorrecta" )
                     self._syntaxErrors = self._syntaxErrors + 1
+                    sys.exit()
                     return
                 self.stackParametros.pop()
                 self.stackContParametros.pop()

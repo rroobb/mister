@@ -4,6 +4,7 @@ FUNCION ENTERO INICIO (ENTERO parametro1 , DECIMAL parametro2) {
 
 	ENTERO num1 = 5;
 	ENTERO num2 = 4;
+	DECIMAL num3;
 	ASIGNAR num1 = 1;
 	MIENTRAS (num1 < 10){
 		SI (num1 > 5){
@@ -13,8 +14,8 @@ FUNCION ENTERO INICIO (ENTERO parametro1 , DECIMAL parametro2) {
 			ASIGNAR num1 = num1 + 1;
 		}
 	}
+	ASIGNAR num1 = "12.34";
 	IMPRIMIR(num1);
-	
 	SI("a" > "b") {
 		IMPRIMIR("a mayor que b");
 	} SINO {
