@@ -1381,8 +1381,7 @@ class misterParser ( Parser ):
         self.quadList.append(['ERA',None,None,tamAux])
 
     def crearCuadruploParam(self, referencia, numParam):
-        elementoLlamada = self.pilaO.pop()
-        self.pTipos.pop()
+        elementoLlamada = self.pilaO[len(self.pilaO) - 1]
         elemParametro = self.obtenerTipoDireccionParametro(self.stackParametros[len(self.stackParametros) - 1], numParam)
         dirParametro = self.obtenerDireccionParametro(elemParametro)
         self.quadList.append(['PARAM',referencia,dirParametro,elementoLlamada])
@@ -1449,6 +1448,8 @@ class misterParser ( Parser ):
                 self._syntaxErrors = self._syntaxErrors + 1
         
         self.stackContParametros[len(self.stackContParametros)-1] = self.stackContParametros[len(self.stackContParametros)-1] + 1
+        self.pilaO.pop()
+        self.pTipos.pop()
 
     def validarTipoRetorno(self):
         if self.RetornoTipo == "NADA":
