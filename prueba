@@ -22,7 +22,6 @@ FUNCION ENTERO INICIO (ENTERO parametro1 , DECIMAL parametro2) {
 	TEXTO p = "hola";
 	DECIMAL num3;
 	PERSONA aux;
-	ASIGNAR aux.jeje.4 = 43;
 	ASIGNAR num3 = 5.342;
 	ASIGNAR num1 = print("hola", &num2, num3, &p);
 	IMPRIMIR(num1);

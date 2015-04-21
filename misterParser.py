@@ -309,6 +309,8 @@ class misterParser ( Parser ):
 
     numeroDirParametroTexto = [] #Para cuadruplo al llamar func
 
+    asignacionRetorno = [] #Para funciones con retorno de variables
+
     cuboSem = cuboSemantico()
 
     quadList = [] #Cuadruplos
@@ -326,8 +328,6 @@ class misterParser ( Parser ):
     memLocalDecimal = 14999 #Contador para memoria virtual de variables locales y temporales decimales
 
     memLocalTexto = 20999 #Contador para memoria virtual de variables locales y temporales texto
-
-    asignaRetornoFuncion = False #Auxiliar para cuadruplo de retorno
 
     atn = ATNDeserializer().deserialize(serializedATN())
 
@@ -1321,9 +1321,6 @@ class misterParser ( Parser ):
                                 self.quadList.append([oper,oIzq,oDer,auxDireccion])
                                 self.insertarValorTipo(auxDireccion,res)
                             elif tipoCuadruplo == 'asignacion':
-                                if self.asignaRetornoFuncion:
-                                    oDer = None
-                                    oper = "asignacionRetorno"
                                 self.quadList.append([oper,oDer,None,oIzq])
                         else:
                             print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Tipos de operandos no compatibles" )
@@ -1400,6 +1397,11 @@ class misterParser ( Parser ):
         elemento = self.pilaO.pop()
         tipoElemento = self.pTipos.pop()
         self.quadList.append(['RETORNAR',None,None,elemento])
+
+    def crearCuadruploAsignacionRetorno(self):
+        elemento = self.asignacionRetorno.pop()
+        if elemento != None:
+            self.quadList.append(['asignacionRetorno',None,None,elemento])
 
     def crearCuadruploTerminarProc(self):
         self.quadList.append([self.terminacionProc,None,None,None])
@@ -2083,7 +2085,6 @@ class misterParser ( Parser ):
                 self.state = 195
                 self.varsAux3()
                 self.crearCuadruploExpresion(4,'asignacion')
-                self.asignaRetornoFuncion = False
 
             elif token in [misterParser.COMA, misterParser.PUNTOYCOMA]:
                 self.enterOuterAlt(localctx, 2)
@@ -2739,12 +2740,33 @@ class misterParser ( Parser ):
                 self.checarMetodo()
                 if self.semanticaCompuestoAux2 == None:
                     self.tipoOperando = self.obtenerTipo(self.semanticaCompuestoAux + '(')
-                    self.asignaRetornoFuncion = True
-                    self.insertarValorTipo(self.semanticaCompuestoAux + '(',self.tipoOperando)
+                    direccion = self.semanticaCompuestoAux + '('
+                    if self.tipoOperando == "ENTERO":
+                        self.memLocalEntero = self.memLocalEntero + 1
+                        direccion = self.memLocalEntero
+                        self.asignacionRetorno.append(direccion)
+                    elif self.tipoOperando == "DECIMAL":
+                        self.memLocalDecimal = self.memLocalDecimal + 1
+                        direccion = self.memLocalDecimal
+                        self.asignacionRetorno.append(direccion)
+                    elif self.tipoOperando == "TEXTO":
+                        self.memLocalTexto = self.memLocalTexto + 1
+                        direccion = self.memLocalTexto
+                        self.asignacionRetorno.append(direccion)
+                    self.insertarValorTipo(direccion,self.tipoOperando)
                 else:
                     self.tipoOperando = self.obtenerTipo(self.semanticaCompuestoAux + '.' + self.semanticaCompuestoAux2 + '(')
-                    self.asignaRetornoFuncion = True
-                    self.insertarValorTipo(self.semanticaCompuestoAux + '.' + self.semanticaCompuestoAux2 + '(',self.tipoOperando)
+                    direccion = self.semanticaCompuestoAux + '.' + self.semanticaCompuestoAux2 + '('
+                    if self.tipoOperando == "ENTERO":
+                        self.memLocalEntero = self.memLocalEntero + 1
+                        direccion = self.memLocalEntero
+                    elif self.tipoOperando == "DECIMAL":
+                        self.memLocalDecimal = self.memLocalDecimal + 1
+                        direccion = self.memLocalDecimal
+                    elif self.tipoOperando == "TEXTO":
+                        self.memLocalTexto = self.memLocalTexto + 1
+                        direccion = self.memLocalTexto
+                    self.insertarValorTipo(direccion,self.tipoOperando)
                 self.llamarFunc()
 
             elif token in [misterParser.Y, misterParser.O, misterParser.IDENTICO, misterParser.COMA, misterParser.SUMA, misterParser.RESTA, misterParser.DIVISION, misterParser.MULTIPLICACION, misterParser.DIFERENTE, misterParser.MAYORIGUAL, misterParser.MENORIGUAL, misterParser.MENOR, misterParser.MAYOR, misterParser.PARENTESIS2, misterParser.CORCHETE2, misterParser.PUNTOYCOMA]:
@@ -3881,6 +3903,7 @@ class misterParser ( Parser ):
             self.numeroDirParametroEntero.pop()
             self.numeroDirParametroDecimal.pop()
             self.numeroDirParametroTexto.pop()
+            self.crearCuadruploAsignacionRetorno()
             self.crearCuadruploGosub(self.stackParametros[len(self.stackParametros) - 1])
             self.checarLongitudParametros()
             
@@ -4583,7 +4606,6 @@ class misterParser ( Parser ):
             self.state = 415
             self.asignacionAux1()
             self.crearCuadruploExpresion(4,'asignacion')
-            self.asignaRetornoFuncion = False
             self.state = 416
             self.match(misterParser.PUNTOYCOMA)
             
