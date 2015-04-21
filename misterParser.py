@@ -291,19 +291,19 @@ class misterParser ( Parser ):
 
     operador = None #Para los cuadruplos
 
-    numeroParametro = 0 #Para cuadruplo al llamar func
+    numeroParametro = [] #Para cuadruplo al llamar func
 
-    numeroParametroEntero = 0 #Para cuadruplo al llamar func
+    numeroParametroEntero = [] #Para cuadruplo al llamar func
 
-    numeroParametroDecimal = 0 #Para cuadruplo al llamar func
+    numeroParametroDecimal = [] #Para cuadruplo al llamar func
 
-    numeroParametroTexto = 0 #Para cuadruplo al llamar func
+    numeroParametroTexto = [] #Para cuadruplo al llamar func
 
-    numeroDirParametroEntero = 0 #Para cuadruplo al llamar func
+    numeroDirParametroEntero = [] #Para cuadruplo al llamar func
 
-    numeroDirParametroDecimal = 0 #Para cuadruplo al llamar func
+    numeroDirParametroDecimal = [] #Para cuadruplo al llamar func
 
-    numeroDirParametroTexto = 0 #Para cuadruplo al llamar func
+    numeroDirParametroTexto = [] #Para cuadruplo al llamar func
 
     cuboSem = cuboSemantico()
 
@@ -322,6 +322,8 @@ class misterParser ( Parser ):
     memLocalDecimal = 14999 #Contador para memoria virtual de variables locales y temporales decimales
 
     memLocalTexto = 20999 #Contador para memoria virtual de variables locales y temporales texto
+
+    asignaRetornoFuncion = False #Auxiliar para cuadruplo de retorno
 
     atn = ATNDeserializer().deserialize(serializedATN())
 
@@ -1209,32 +1211,32 @@ class misterParser ( Parser ):
         tipoDireccion = tipoDireccion.split(',')
         if len(tipoDireccion) == 1:
             if tipoDireccion[0] == 'ENTERO':
-                offset = self.numeroParametroEntero + self.numeroDirParametroEntero
-                self.numeroParametroEntero = self.numeroParametroEntero + 1
+                offset = self.numeroParametroEntero[len(self.numeroParametroEntero) - 1] + self.numeroDirParametroEntero[len(self.numeroDirParametroEntero) - 1]
+                self.numeroParametroEntero[len(self.numeroParametroEntero) - 1] = self.numeroParametroEntero[len(self.numeroParametroEntero) - 1] + 1
                 return 9000 + offset
             elif tipoDireccion[0] == 'DECIMAL':
-                offset = self.numeroParametroDecimal + self.numeroDirParametroDecimal
-                self.numeroParametroDecimal = self.numeroParametroDecimal + 1
+                offset = self.numeroParametroDecimal[len(self.numeroParametroDecimal) - 1] + self.numeroDirParametroDecimal[len(self.numeroDirParametroDecimal) - 1]
+                self.numeroParametroDecimal[len(self.numeroParametroDecimal) - 1] = self.numeroParametroDecimal[len(self.numeroParametroDecimal) - 1] + 1
                 return 15000 + offset
             elif tipoDireccion[0] == 'TEXTO':
-                offset = self.numeroParametroTexto + self.numeroDirParametroTexto
-                self.numeroParametroTexto = self.numeroParametroTexto + 1
+                offset = self.numeroParametroTexto[len(self.numeroParametroTexto) - 1] + self.numeroDirParametroTexto[len(self.numeroDirParametroTexto) - 1]
+                self.numeroParametroTexto[len(self.numeroParametroTexto) - 1] = self.numeroParametroTexto[len(self.numeroParametroTexto) - 1] + 1
                 return 21000 + offset
         else:
             if tipoDireccion[1] == 'ENTERO':
-                offset = self.numeroParametroEntero + self.numeroDirParametroEntero
-                self.numeroParametroEntero = self.numeroParametroEntero + 1
-                self.numeroDirParametroEntero = self.numeroDirParametroEntero + int(tipoDireccion[2]) - 1
+                offset = self.numeroParametroEntero[len(self.numeroParametroEntero) - 1] + self.numeroDirParametroEntero[len(self.numeroDirParametroEntero) - 1]
+                self.numeroParametroEntero[len(self.numeroParametroEntero) - 1] = self.numeroParametroEntero[len(self.numeroParametroEntero) - 1] + 1
+                self.numeroDirParametroEntero[len(self.numeroDirParametroEntero) - 1] = self.numeroDirParametroEntero[len(self.numeroDirParametroEntero) - 1] + int(tipoDireccion[2]) - 1
                 return 9000 + offset
             elif tipoDireccion[1] == 'DECIMAL':
-                offset = self.numeroParametroDecimal + self.numeroDirParametroDecimal
-                self.numeroParametroDecimal = self.numeroParametroDecimal + 1
-                self.numeroDirParametroDecimal = self.numeroDirParametroDecimal + int(tipoDireccion[2]) - 1
+                offset = self.numeroParametroDecimal[len(self.numeroParametroDecimal) - 1] + self.numeroDirParametroDecimal[len(self.numeroDirParametroDecimal) - 1]
+                self.numeroParametroDecimal[len(self.numeroParametroDecimal) - 1] = self.numeroParametroDecimal[len(self.numeroParametroDecimal) - 1] + 1
+                self.numeroDirParametroDecimal[len(self.numeroDirParametroDecimal) - 1] = self.numeroDirParametroDecimal[len(self.numeroDirParametroDecimal) - 1] + int(tipoDireccion[2]) - 1
                 return 15000 + offset
             elif tipoDireccion[1] == 'TEXTO':
-                offset = self.numeroParametroTexto + self.numeroDirParametroTexto
-                self.numeroParametroTexto = self.numeroParametroTexto + 1
-                self.numeroDirParametroTexto = self.numeroDirParametroTexto + int(tipoDireccion[2]) - 1
+                offset = self.numeroParametroTexto[len(self.numeroParametroTexto) - 1] + self.numeroDirParametroTexto[len(self.numeroDirParametroTexto) - 1]
+                self.numeroParametroTexto[len(self.numeroParametroTexto) - 1] = self.numeroParametroTexto[len(self.numeroParametroTexto) - 1] + 1
+                self.numeroDirParametroTexto[len(self.numeroDirParametroTexto) - 1] = self.numeroDirParametroTexto[len(self.numeroDirParametroTexto) - 1] + int(tipoDireccion[2]) - 1
                 return 21000 + offset
 
         return -1
@@ -1313,6 +1315,9 @@ class misterParser ( Parser ):
                                 self.quadList.append([oper,oIzq,oDer,auxDireccion])
                                 self.insertarValorTipo(auxDireccion,res)
                             elif tipoCuadruplo == 'asignacion':
+                                if self.asignaRetornoFuncion:
+                                    oDer = None
+                                    oper = "asignacionRetorno"
                                 self.quadList.append([oper,oDer,None,oIzq])
                         else:
                             print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Tipos de operandos no compatibles" )
@@ -1376,7 +1381,7 @@ class misterParser ( Parser ):
         self.quadList.append(['ERA',None,None,tamAux])
 
     def crearCuadruploParam(self, referencia, numParam):
-        elementoLlamada = self.pilaO[len(self.pilaO) -1]
+        elementoLlamada = self.pilaO[len(self.pilaO) - 1]
         elemParametro = self.obtenerTipoDireccionParametro(self.stackParametros[len(self.stackParametros) - 1], numParam)
         dirParametro = self.obtenerDireccionParametro(elemParametro)
         self.quadList.append(['PARAM',referencia,dirParametro,elementoLlamada])
@@ -1384,6 +1389,11 @@ class misterParser ( Parser ):
     def crearCuadruploGosub(self, nombreFuncion):
         dirAux = self.obtenerDireccionFuncion(nombreFuncion)
         self.quadList.append(['GOSUB',None,None,dirAux])
+
+    def crearCuadruploRetornar(self):
+        elemento = self.pilaO.pop()
+        tipoElemento = self.pTipos.pop()
+        self.quadList.append(['RETORNAR',None,None,elemento])
 
     def crearCuadruploTerminarProc(self):
         self.quadList.append([self.terminacionProc,None,None,None])
@@ -1438,6 +1448,8 @@ class misterParser ( Parser ):
                 self._syntaxErrors = self._syntaxErrors + 1
         
         self.stackContParametros[len(self.stackContParametros)-1] = self.stackContParametros[len(self.stackContParametros)-1] + 1
+        self.pilaO.pop()
+        self.pTipos.pop()
 
     def validarTipoRetorno(self):
         if self.RetornoTipo == "NADA":
@@ -2065,6 +2077,7 @@ class misterParser ( Parser ):
                 self.state = 193
                 self.varsAux3()
                 self.crearCuadruploExpresion(4,'asignacion')
+                self.asignaRetornoFuncion = False
 
             elif token in [misterParser.COMA, misterParser.PUNTOYCOMA]:
                 self.enterOuterAlt(localctx, 2)
@@ -2720,9 +2733,11 @@ class misterParser ( Parser ):
                 self.checarMetodo()
                 if self.semanticaCompuestoAux2 == None:
                     self.tipoOperando = self.obtenerTipo(self.semanticaCompuestoAux + '(')
+                    self.asignaRetornoFuncion = True
                     self.insertarValorTipo(self.semanticaCompuestoAux + '(',self.tipoOperando)
                 else:
                     self.tipoOperando = self.obtenerTipo(self.semanticaCompuestoAux + '.' + self.semanticaCompuestoAux2 + '(')
+                    self.asignaRetornoFuncion = True
                     self.insertarValorTipo(self.semanticaCompuestoAux + '.' + self.semanticaCompuestoAux2 + '(',self.tipoOperando)
                 self.llamarFunc()
 
@@ -3237,6 +3252,7 @@ class misterParser ( Parser ):
                 self.state = 293
                 self.expresion()
                 self.validarTipoRetorno()
+                self.crearCuadruploRetornar()
                 self.state = 294
                 self.match(misterParser.PUNTOYCOMA)
 
@@ -3840,18 +3856,25 @@ class misterParser ( Parser ):
             elif self.semanticaCompuestoAux != None:
                 self.stackParametros.append(self.semanticaCompuestoAux + "(")
                 self.stackContParametros.append(0)
-            self.numeroParametro = 0
-            self.numeroParametroEntero = 0
-            self.numeroParametroDecimal = 0
-            self.numeroParametroTexto = 0
-            self.numeroDirParametroEntero = 0
-            self.numeroDirParametroDecimal = 0
-            self.numeroDirParametroTexto = 0
+            self.numeroParametro.append(0)
+            self.numeroParametroEntero.append(0)
+            self.numeroParametroDecimal.append(0)
+            self.numeroParametroTexto.append(0)
+            self.numeroDirParametroEntero.append(0)
+            self.numeroDirParametroDecimal.append(0)
+            self.numeroDirParametroTexto.append(0)
             self.crearCuadruploEra(self.stackParametros[len(self.stackParametros) - 1])
             self.state = 346
             self.llamarFuncAux1()
             self.state = 347
             self.match(misterParser.PARENTESIS2)
+            self.numeroParametro.pop()
+            self.numeroParametroEntero.pop()
+            self.numeroParametroDecimal.pop()
+            self.numeroParametroTexto.pop()
+            self.numeroDirParametroEntero.pop()
+            self.numeroDirParametroDecimal.pop()
+            self.numeroDirParametroTexto.pop()
             self.crearCuadruploGosub(self.stackParametros[len(self.stackParametros) - 1])
             self.checarLongitudParametros()
             
@@ -3910,8 +3933,8 @@ class misterParser ( Parser ):
                 self.state = 349
                 self.expresion()
                 self.state = 350
-                self.crearCuadruploParam(False, self.numeroParametro)
-                self.numeroParametro = self.numeroParametro + 1
+                self.crearCuadruploParam(False, self.numeroParametro[len(self.numeroParametro) - 1])
+                self.numeroParametro[len(self.numeroParametro) - 1] = self.numeroParametro[len(self.numeroParametro) - 1] + 1
                 self.llamarFuncAux2()
 
             elif token in [misterParser.REFERENCIA]:
@@ -3925,8 +3948,8 @@ class misterParser ( Parser ):
                 auxDir = self.obtenerDireccionVariable(paramReferenciaId)
                 self.insertarValorTipo(auxDir, paramReferenciaTipo)
                 self.state = 354
-                self.crearCuadruploParam(True, self.numeroParametro)
-                self.numeroParametro = self.numeroParametro + 1
+                self.crearCuadruploParam(True, self.numeroParametro[len(self.numeroParametro) - 1])
+                self.numeroParametro[len(self.numeroParametro) - 1] = self.numeroParametro[len(self.numeroParametro) - 1] + 1
                 self.llamarFuncAux2()
 
             elif token in [misterParser.PARENTESIS2]:
@@ -4048,8 +4071,8 @@ class misterParser ( Parser ):
                 self.enterOuterAlt(localctx, 1)
                 self.state = 365
                 self.expresion()
-                self.crearCuadruploParam(False, self.numeroParametro)
-                self.numeroParametro = self.numeroParametro + 1
+                self.crearCuadruploParam(False, self.numeroParametro[len(self.numeroParametro) - 1])
+                self.numeroParametro[len(self.numeroParametro) - 1] = self.numeroParametro[len(self.numeroParametro) - 1] + 1
 
             elif token in [misterParser.REFERENCIA]:
                 self.enterOuterAlt(localctx, 2)
@@ -4061,8 +4084,8 @@ class misterParser ( Parser ):
                 paramReferenciaTipo = self.obtenerTipo(paramReferenciaId)
                 auxDir = self.obtenerDireccionVariable(paramReferenciaId)
                 self.insertarValorTipo(auxDir, paramReferenciaTipo)
-                self.crearCuadruploParam(True, self.numeroParametro)
-                self.numeroParametro = self.numeroParametro + 1
+                self.crearCuadruploParam(True, self.numeroParametro[len(self.numeroParametro) - 1])
+                self.numeroParametro[len(self.numeroParametro) - 1] = self.numeroParametro[len(self.numeroParametro) - 1] + 1
 
             else:
                 raise NoViableAltException(self)
@@ -4493,6 +4516,7 @@ class misterParser ( Parser ):
             self.state = 407
             self.asignacionAux1()
             self.crearCuadruploExpresion(4,'asignacion')
+            self.asignaRetornoFuncion = False
             self.state = 408
             self.match(misterParser.PUNTOYCOMA)
             
