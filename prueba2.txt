@@ -35,7 +35,7 @@ FUNCION ENTERO INICIO (ENTERO parametro1 , DECIMAL parametro2) {
 		ASIGNAR d = f / e;
 	}
 	ASIGNAR d = d - 3;
-	area(3.0+9.0,4.0);
+	area(area(9.0,2.0),4.0);
 	
 	ASIGNAR z = 8.0;
 	ASIGNAR w = 3.0;
