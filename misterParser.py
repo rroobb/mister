@@ -1399,9 +1399,10 @@ class misterParser ( Parser ):
         self.quadList.append(['RETORNAR',None,None,elemento])
 
     def crearCuadruploAsignacionRetorno(self):
-        elemento = self.asignacionRetorno.pop()
-        if elemento != None:
-            self.quadList.append(['asignacionRetorno',None,None,elemento])
+        if self.asignacionRetorno:
+            elemento = self.asignacionRetorno.pop()
+            if elemento != None:
+                self.quadList.append(['asignacionRetorno',None,None,elemento])
 
     def crearCuadruploTerminarProc(self):
         self.quadList.append([self.terminacionProc,None,None,None])
