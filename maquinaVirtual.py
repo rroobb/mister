@@ -216,7 +216,6 @@ class maquinaVirtual:
 
 		elif type(aux[3]) is list:
 			valor = aux[3][0]
-
 		indexs = self.obtenerDireccion(aux[2])
 		self.memoria[indexs[0]][indexs[1]][indexs[2]] = valor
 		if aux[1]:

@@ -203,7 +203,11 @@ factorAux1: SUMA
 compuesto: ID compuestoAux1
     ;
     
-compuestoAux1: PUNTO ID
+compuestoAux1: PUNTO ID compuestoAux2
+    |
+    ;
+
+compuestoAux2: PUNTO CTENTERO
     |
     ;
 

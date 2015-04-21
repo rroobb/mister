@@ -445,6 +445,15 @@ class misterListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by misterParser#compuestoAux2.
+    def enterCompuestoAux2(self, ctx):
+        pass
+
+    # Exit a parse tree produced by misterParser#compuestoAux2.
+    def exitCompuestoAux2(self, ctx):
+        pass
+
+
     # Enter a parse tree produced by misterParser#asignacion.
     def enterAsignacion(self, ctx):
         pass
