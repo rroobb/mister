@@ -1,7 +1,16 @@
+CLASE PERSONA {
+	ATRIBUTOS:
+		PUBLICO ENTERO numero3;
+		PUBLICO ENTERO numero4;
+		PUBLICO LISTA ENTERO 3 jeje;
+	METODOS:
+		FUNCION NADA print(ENTERO asdalsd){
+			TEXTO hola;
+			ASIGNAR hola = "hola";
+		}
+};
 
 FUNCION ENTERO print (TEXTO param1, ENTERO parametro1 , DECIMAL parametro2, TEXTO p){
-
-
 
 	RETORNAR -10;
 	
@@ -12,8 +21,8 @@ FUNCION ENTERO INICIO (ENTERO parametro1 , DECIMAL parametro2) {
 	ENTERO num2 = 4;
 	TEXTO p = "hola";
 	DECIMAL num3;
-
-
+	PERSONA aux;
+	ASIGNAR aux.jeje.4 = 43;
 	ASIGNAR num3 = 5.342;
 	ASIGNAR num1 = print("hola", &num2, num3, &p);
 	IMPRIMIR(num1);
