@@ -9,15 +9,18 @@ FUNCION DECIMAL area (DECIMAL alto, DECIMAL ancho) {
 	RETORNAR resultado;
 }
 
-FUNCION NADA print (TEXTO x) {
+FUNCION NADA print (ENTERO en, LISTA ENTERO 8 x, ENTERO en2, DECIMAL de, DECIMAL de2, TEXTO te, LISTA DECIMAL 2 l2, TEXTO te2, LISTA TEXTO 3 te3
+, DECIMAL de3, LISTA ENTERO 2 len, ENTERO en3, TEXTO te4) {
 	TEXTO i;
-	ASIGNAR i = x;
+	ASIGNAR i = "hola";
 	IMPRIMIR(i);
 }
 
 FUNCION ENTERO INICIO (ENTERO parametro1 , DECIMAL parametro2) {
 	ENTERO x;
 	LISTA ENTERO 3 milista = [2,1,2];
+	LISTA DECIMAL 3 milista2 = [2,1,2];
+	LISTA TEXTO 3 milista3;
 	ENTERO y;
 	DECIMAL z,w;
 	TEXTO v;
@@ -32,14 +35,14 @@ FUNCION ENTERO INICIO (ENTERO parametro1 , DECIMAL parametro2) {
 		ASIGNAR d = f / e;
 	}
 	ASIGNAR d = d - 3;
-	area(9.0+3.0,4.0);
+	area(3.0+9.0,4.0);
 	
 	ASIGNAR z = 8.0;
 	ASIGNAR w = 3.0;
-	area(z,w);
+	area(5.3,4.8);
 	
 	ASIGNAR v = "hola";
-	print(v);
+	print(3,milista,4,4.0,5.0,v,milista2,"hola",milista3,3.2,milista,10,"hey");
 	
 	ASIGNAR x = 2;
 	ASIGNAR y = 4;

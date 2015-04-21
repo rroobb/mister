@@ -170,7 +170,9 @@ class maquinaVirtual:
 
 #ERA, null, null, [contEnteros,contDecimales,contTextos]
 
-#PARAM,null,null,elemento
+#PARAM, true/false referencia, DirFuncionLocal, DirLLamada/[constante]
+
+#Retornar: =, valor/dir, None, DirDestino
 
 #GOSUB,null,null,direccionInicioFuncion
 

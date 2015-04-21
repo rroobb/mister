@@ -291,6 +291,20 @@ class misterParser ( Parser ):
 
     operador = None #Para los cuadruplos
 
+    numeroParametro = 0 #Para cuadruplo al llamar func
+
+    numeroParametroEntero = 0 #Para cuadruplo al llamar func
+
+    numeroParametroDecimal = 0 #Para cuadruplo al llamar func
+
+    numeroParametroTexto = 0 #Para cuadruplo al llamar func
+
+    numeroDirParametroEntero = 0 #Para cuadruplo al llamar func
+
+    numeroDirParametroDecimal = 0 #Para cuadruplo al llamar func
+
+    numeroDirParametroTexto = 0 #Para cuadruplo al llamar func
+
     cuboSem = cuboSemantico()
 
     quadList = [] #Cuadruplos
@@ -1097,7 +1111,7 @@ class misterParser ( Parser ):
                     if self.dirPrincipal.get(listaAux[0]):
                         return self.dirPrincipal[listaAux[0]][5]
                 else:
-                    return encontrarParametrosFuncionClase(self.claseActual, listaAux[0])
+                    return self.encontrarParametrosFuncionClase(self.claseActual, listaAux[0])
         else:
             if self.claseActual == None:
                 if self.funcionActual == None:
@@ -1120,6 +1134,86 @@ class misterParser ( Parser ):
             if listaAux[1].find("(") > 0:
                 return self.encontrarParametrosFuncionClase(clase, listaAux[1].replace("(", ""))
 
+    def encontrarDirParametroFuncionClase(self, padre, funcion, numParam):
+        while True:
+            dictAux = self.dirPrincipal[padre][1]
+            value = dictAux.get(funcion)
+            if value != None:
+                return value[3][numParam]
+            padre = self.dirPrincipal[padre][2]
+            if padre == None:
+                break
+        return
+
+    def obtenerTipoDireccionParametro(self, stringVariable, numParam):
+        if stringVariable == None :
+            return None
+        listaAux = stringVariable.split(".")
+        if len(listaAux) == 1:
+            if listaAux[0].find("(") > 0:
+                listaAux[0] = listaAux[0].replace("(", "")
+                if self.claseActual == None:
+                    if self.dirPrincipal.get(listaAux[0]):
+                        return self.dirPrincipal[listaAux[0]][5][numParam]
+                else:
+                    return self.encontrarDirParametroFuncionClase(self.claseActual, listaAux[0], numParam)
+        else:
+            if self.claseActual == None:
+                if self.funcionActual == None:
+                    if self.dirPrincipal['global'][3].get(listaAux[0]):
+                        clase = self.dirPrincipal['global'][3][listaAux[0]][0]
+                else:
+                    clase = self.dirPrincipal[self.funcionActual][3].get(listaAux[0])
+                    if clase != None:
+                        clase = clase[0]
+                    else:
+                        clase = self.dirPrincipal['global'][3].get(listaAux[0])
+                        if clase == None:
+                            return
+                        clase = clase[0]
+            else:
+                if self.funcionActual != None:
+                    if self.dirPrincipal[self.claseActual][1][self.funcionActual][1].get(listaAux[0]):
+                        clase = self.dirPrincipal[self.claseActual][1][self.funcionActual][1][listaAux[0]][0]
+
+            if listaAux[1].find("(") > 0:
+                return self.encontrarDirParametroFuncionClase(clase, listaAux[1].replace("(", ""), numParam)
+
+    def obtenerDireccionParametro(self, tipoDireccion):
+        offset = 0
+        tipoDireccion = tipoDireccion.split(',')
+        if len(tipoDireccion) == 1:
+            if tipoDireccion[0] == 'ENTERO':
+                offset = self.numeroParametroEntero + self.numeroDirParametroEntero
+                self.numeroParametroEntero = self.numeroParametroEntero + 1
+                return 9000 + offset
+            elif tipoDireccion[0] == 'DECIMAL':
+                offset = self.numeroParametroDecimal + self.numeroDirParametroDecimal
+                self.numeroParametroDecimal = self.numeroParametroDecimal + 1
+                return 15000 + offset
+            elif tipoDireccion[0] == 'TEXTO':
+                offset = self.numeroParametroTexto + self.numeroDirParametroTexto
+                self.numeroParametroTexto = self.numeroParametroTexto + 1
+                return 21000 + offset
+        else:
+            if tipoDireccion[1] == 'ENTERO':
+                offset = self.numeroParametroEntero + self.numeroDirParametroEntero
+                self.numeroParametroEntero = self.numeroParametroEntero + 1
+                self.numeroDirParametroEntero = self.numeroDirParametroEntero + int(tipoDireccion[2]) - 1
+                return 9000 + offset
+            elif tipoDireccion[1] == 'DECIMAL':
+                offset = self.numeroParametroDecimal + self.numeroDirParametroDecimal
+                self.numeroParametroDecimal = self.numeroParametroDecimal + 1
+                self.numeroDirParametroDecimal = self.numeroDirParametroDecimal + int(tipoDireccion[2]) - 1
+                return 15000 + offset
+            elif tipoDireccion[1] == 'TEXTO':
+                offset = self.numeroParametroTexto + self.numeroDirParametroTexto
+                self.numeroParametroTexto = self.numeroParametroTexto + 1
+                self.numeroDirParametroTexto = self.numeroDirParametroTexto + int(tipoDireccion[2]) - 1
+                return 21000 + offset
+
+        return -1
+
     def checarClase(self):
         if self.dirPrincipal.get(self.AuxTipoVar) == None:
             print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Clase no declarada" )
@@ -1127,29 +1221,34 @@ class misterParser ( Parser ):
             sys.exit()
             return
 
-    def agregarParametro(self):
-        tipo = self.getCurrentToken().text
+    def agregarParametro(self, tipo):
         if self.claseActual ==  None:
             dic = self.dirPrincipal[self.funcionActual]
-            dic[5].append(tipo)
             if tipo == "ENTERO":
+                dic[5].append(tipo)
                 dic[4][0] = dic[4][0] + 1
             elif tipo == "DECIMAL":
+                dic[5].append(tipo)
                 dic[4][1] = dic[4][1] + 1
             elif tipo == "TEXTO":
+                dic[5].append(tipo)
                 dic[4][2] = dic[4][2] + 1
             elif tipo == "LISTA":
+                dic[5].append(tipo+','+self.AuxTipoLista+','+self.AuxTamanioLista)
                 dic[4][3] = dic[4][3] + 1
         else: 
             dic = self.dirPrincipal[self.claseActual][1][self.funcionActual]
-            dic[3].append(tipo)
             if tipo == "ENTERO":
+                dic[3].append(tipo)
                 dic[2][0] = dic[2][0] + 1
             elif tipo == "DECIMAL":
+                dic[3].append(tipo)
                 dic[2][1] = dic[2][1] + 1
             elif tipo == "TEXTO":
+                dic[3].append(tipo)
                 dic[2][2] = dic[2][2] + 1
             elif tipo == "LISTA":
+                dic[3].append(tipo+','+self.AuxTipoLista+','+self.AuxTamanioLista)
                 dic[2][3] = dic[2][3] + 1
     
     def checarParametro(self):
@@ -1249,9 +1348,11 @@ class misterParser ( Parser ):
         tamAux = self.obtenerTamanioFuncion(nombreFuncion)
         self.quadList.append(['ERA',None,None,tamAux])
 
-    def crearCuadruploParam(self):
-        elemento = self.pilaO[len(self.pilaO) -1]
-        self.quadList.append(['PARAM',None,None,elemento])
+    def crearCuadruploParam(self, referencia, numParam):
+        elementoLlamada = self.pilaO[len(self.pilaO) -1]
+        elemParametro = self.obtenerTipoDireccionParametro(self.stackParametros[len(self.stackParametros) - 1], numParam)
+        dirParametro = self.obtenerDireccionParametro(elemParametro)
+        self.quadList.append(['PARAM',referencia,dirParametro,elementoLlamada])
 
     def crearCuadruploGosub(self, nombreFuncion):
         dirAux = self.obtenerDireccionFuncion(nombreFuncion)
@@ -1297,9 +1398,17 @@ class misterParser ( Parser ):
             self._syntaxErrors = self._syntaxErrors + 1
             self.stackContParametros[len(self.stackContParametros)-1] = self.stackContParametros[len(self.stackContParametros)-1] + 1
             return
-        if listaPar[cont] != self.pTipos[len(self.pTipos)-1]:
-            print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " El tipo de parametro es incorrecto" )
-            self._syntaxErrors = self._syntaxErrors + 1
+        tipoParametro = listaPar[cont].split(',')
+        tipoLlamada = self.pTipos[len(self.pTipos)-1].split(',')
+        if (len(tipoParametro) == 1) or (len(tipoLlamada) == 1):
+            if tipoParametro[0] != tipoLlamada[0]:
+                print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " El tipo de parametro es incorrecto" )
+                self._syntaxErrors = self._syntaxErrors + 1
+        else:
+            if (tipoParametro[0] != tipoLlamada[0]) or (tipoParametro[1] != tipoLlamada[1]):
+                print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " El tipo de parametro es incorrecto" )
+                self._syntaxErrors = self._syntaxErrors + 1
+        
         self.stackContParametros[len(self.stackContParametros)-1] = self.stackContParametros[len(self.stackContParametros)-1] + 1
 
     def validarTipoRetorno(self):
@@ -2773,13 +2882,15 @@ class misterParser ( Parser ):
             if token in [misterParser.ENTERO, misterParser.DECIMAL, misterParser.TEXTO]:
                 self.enterOuterAlt(localctx, 1)
                 self.state = 261
-                self.agregarParametro()
+                self.agregarParametro(self.getCurrentToken().text)
                 self.tipo()
 
             elif token in [misterParser.LISTA]:
                 self.enterOuterAlt(localctx, 2)
                 self.state = 262
+                tipo = self.getCurrentToken().text
                 self.l_list()
+                self.agregarParametro(tipo)
 
             else:
                 raise NoViableAltException(self)
@@ -3694,6 +3805,13 @@ class misterParser ( Parser ):
             elif self.semanticaCompuestoAux != None:
                 self.stackParametros.append(self.semanticaCompuestoAux + "(")
                 self.stackContParametros.append(0)
+            self.numeroParametro = 0
+            self.numeroParametroEntero = 0
+            self.numeroParametroDecimal = 0
+            self.numeroParametroTexto = 0
+            self.numeroDirParametroEntero = 0
+            self.numeroDirParametroDecimal = 0
+            self.numeroDirParametroTexto = 0
             self.crearCuadruploEra(self.stackParametros[len(self.stackParametros) - 1])
             self.state = 346
             self.llamarFuncAux1()
@@ -3757,7 +3875,8 @@ class misterParser ( Parser ):
                 self.state = 349
                 self.expresion()
                 self.state = 350
-                self.crearCuadruploParam()
+                self.crearCuadruploParam(False, self.numeroParametro)
+                self.numeroParametro = self.numeroParametro + 1
                 self.llamarFuncAux2()
 
             elif token in [misterParser.REFERENCIA]:
@@ -3771,7 +3890,8 @@ class misterParser ( Parser ):
                 auxDir = self.obtenerDireccionVariable(paramReferenciaId)
                 self.insertarValorTipo(auxDir, paramReferenciaTipo)
                 self.state = 354
-                self.crearCuadruploParam()
+                self.crearCuadruploParam(True, self.numeroParametro)
+                self.numeroParametro = self.numeroParametro + 1
                 self.llamarFuncAux2()
 
             elif token in [misterParser.PARENTESIS2]:
@@ -3893,7 +4013,8 @@ class misterParser ( Parser ):
                 self.enterOuterAlt(localctx, 1)
                 self.state = 365
                 self.expresion()
-                self.crearCuadruploParam()
+                self.crearCuadruploParam(False, self.numeroParametro)
+                self.numeroParametro = self.numeroParametro + 1
 
             elif token in [misterParser.REFERENCIA]:
                 self.enterOuterAlt(localctx, 2)
@@ -3905,7 +4026,8 @@ class misterParser ( Parser ):
                 paramReferenciaTipo = self.obtenerTipo(paramReferenciaId)
                 auxDir = self.obtenerDireccionVariable(paramReferenciaId)
                 self.insertarValorTipo(auxDir, paramReferenciaTipo)
-                self.crearCuadruploParam()
+                self.crearCuadruploParam(True, self.numeroParametro)
+                self.numeroParametro = self.numeroParametro + 1
 
             else:
                 raise NoViableAltException(self)
