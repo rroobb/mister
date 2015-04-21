@@ -209,7 +209,8 @@ class maquinaVirtual:
 		valor = None
 		if type(aux[3]) is int:
 			indexs = self.obtenerDireccion(aux[3])
-			valor = self.memoria[indexs[0]][indexs[1]][indexs[2]]
+			valor = self.memoria[indexs[0]][indexs[1]][indexs[2] - self.stackCantidadEspacio[len(self.stackCantidadEspacio) - 2][indexs[1]]
+			]
 
 		elif type(aux[3]) is list:
 			valor = aux[3][0]
@@ -223,19 +224,27 @@ class maquinaVirtual:
 		for par in referencias:
 			indexs1 = self.obtenerDireccion(par[0])
 			indexs2 = self.obtenerDireccion(par[1])
-			self.memoria[indexs2[0]][indexs2[1]][indexs2[2]] = self.memoria[indexs1[0]][indexs1[1]][indexs1[2]]
+			self.memoria[indexs2[0]][indexs2[1]][indexs2[2]- self.stackCantidadEspacio[len(self.stackCantidadEspacio) - 2][indexs2[1]]] = self.memoria[indexs1[0]][indexs1[1]][indexs1[2]]
 
 	def endproc(self):
 		self.InstruccionIndex = self.stackDireccionesFunciones.pop()
 		referencias = self.stackPorReferenciaFunciones.pop()
 		self.asignarReferencias(referencias)
 		aux = self.stackCantidadEspacio.pop()
-		del self.memoria[1][0][-aux[0]:]
-		self.contLocalInt = self.contLocalInt - aux[0]
-		del self.memoria[1][1][-aux[1]:]
-		self.contLocalDecimal = self.contLocalDecimal - aux[1]
-		del self.memoria[1][2][-aux[2]:]
-		self.contLocalTexto = self.contLocalTexto - aux[2]
+		if aux[0] > 0:
+			del self.memoria[1][0][-aux[0]:]
+			self.contLocalInt = self.contLocalInt - aux[0]
+		if aux[1] > 0:
+			del self.memoria[1][1][-aux[1]:]
+			self.contLocalDecimal = self.contLocalDecimal - aux[1]
+		if aux[2] > 0:
+			del self.memoria[1][2][-aux[2]:]
+			self.contLocalTexto = self.contLocalTexto - aux[2]
+
+	def retornar(self):
+		indexs1 = self.obtenerDireccion(self.cuadruplos[self.InstruccionIndex][1])
+		indexs2 = self.obtenerDireccion(self.cuadruplos[self.InstruccionIndex][3])
+		self.memoria[indexs2[0]][indexs2[1]][indexs2[2]- self.stackCantidadEspacio[len(self.stackCantidadEspacio) - 2][indexs2[1]]] = self.memoria[indexs1[0]][indexs1[1]][indexs1[2]]
 
 #ERA, null, null, [contEnteros,contDecimales,contTextos]
 
@@ -248,6 +257,8 @@ class maquinaVirtual:
 #[ENDPROC, None, None, None]
 
 #[END, None, None, None]
+
+#[RETORNAR,direccionqueManda,None,direccionDestino]
 
 	def empezar(self):
 		while (self.cuadruplos[self.InstruccionIndex][0] != "END"):
@@ -280,7 +291,8 @@ class maquinaVirtual:
 
 			elif self.cuadruplos[self.InstruccionIndex][0] == "leer":
 				self.leer()
-
+			elif self.cuadruplos[self.InstruccionIndex][0] == "RETORNAR":
+				self.retornar()
 			self.InstruccionIndex = self.InstruccionIndex + 1
 
 
