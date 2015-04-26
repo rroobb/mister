@@ -314,6 +314,8 @@ class misterParser ( Parser ):
 
     asignacionRetorno = [] #Para funciones con retorno de variables
 
+    stackCuadruploParam = [] #Temporal para cuadruplos param
+
     cuboSem = cuboSemantico()
 
     quadList = [] #Cuadruplos
@@ -1387,11 +1389,17 @@ class misterParser ( Parser ):
         tamAux = self.obtenerTamanioFuncion(nombreFuncion)
         self.quadList.append(['ERA',None,None,tamAux])
 
-    def crearCuadruploParam(self, referencia, numParam):
+    def guardarCuadruploParam(self, referencia, numParam):
         elementoLlamada = self.pilaO[len(self.pilaO) - 1]
         elemParametro = self.obtenerTipoDireccionParametro(self.stackParametros[len(self.stackParametros) - 1], numParam)
         dirParametro = self.obtenerDireccionParametro(elemParametro)
-        self.quadList.append(['PARAM',referencia,dirParametro,elementoLlamada])
+        self.stackCuadruploParam.append(['PARAM',referencia,dirParametro,elementoLlamada])
+
+    def crearCuadruploParam(self):
+        if self.stackCuadruploParam:
+            for x in range(0,self.stackContParametros[len(self.stackContParametros)-1]):
+                quad = self.stackCuadruploParam.pop()
+                self.quadList.append(quad)
 
     def crearCuadruploGosub(self, nombreFuncion):
         dirAux = self.obtenerDireccionFuncion(nombreFuncion)
@@ -3896,11 +3904,12 @@ class misterParser ( Parser ):
             self.numeroDirParametroEntero.append(0)
             self.numeroDirParametroDecimal.append(0)
             self.numeroDirParametroTexto.append(0)
-            self.crearCuadruploEra(self.stackParametros[len(self.stackParametros) - 1])
             self.state = 350
             self.llamarFuncAux1()
             self.state = 351
             self.match(misterParser.PARENTESIS2)
+            self.crearCuadruploEra(self.stackParametros[len(self.stackParametros) - 1])
+            self.crearCuadruploParam()
             self.numeroParametro.pop()
             self.numeroParametroEntero.pop()
             self.numeroParametroDecimal.pop()
@@ -3967,7 +3976,7 @@ class misterParser ( Parser ):
                 self.state = 353
                 self.expresion()
                 self.state = 354
-                self.crearCuadruploParam(False, self.numeroParametro[len(self.numeroParametro) - 1])
+                self.guardarCuadruploParam(False, self.numeroParametro[len(self.numeroParametro) - 1])
                 self.numeroParametro[len(self.numeroParametro) - 1] = self.numeroParametro[len(self.numeroParametro) - 1] + 1
                 self.llamarFuncAux2()
 
@@ -3982,7 +3991,7 @@ class misterParser ( Parser ):
                 auxDir = self.obtenerDireccionVariable(paramReferenciaId)
                 self.insertarValorTipo(auxDir, paramReferenciaTipo)
                 self.state = 358
-                self.crearCuadruploParam(True, self.numeroParametro[len(self.numeroParametro) - 1])
+                self.guardarCuadruploParam(True, self.numeroParametro[len(self.numeroParametro) - 1])
                 self.numeroParametro[len(self.numeroParametro) - 1] = self.numeroParametro[len(self.numeroParametro) - 1] + 1
                 self.llamarFuncAux2()
 
@@ -4105,7 +4114,7 @@ class misterParser ( Parser ):
                 self.enterOuterAlt(localctx, 1)
                 self.state = 369
                 self.expresion()
-                self.crearCuadruploParam(False, self.numeroParametro[len(self.numeroParametro) - 1])
+                self.guardarCuadruploParam(False, self.numeroParametro[len(self.numeroParametro) - 1])
                 self.numeroParametro[len(self.numeroParametro) - 1] = self.numeroParametro[len(self.numeroParametro) - 1] + 1
 
             elif token in [misterParser.REFERENCIA]:
@@ -4118,7 +4127,7 @@ class misterParser ( Parser ):
                 paramReferenciaTipo = self.obtenerTipo(paramReferenciaId)
                 auxDir = self.obtenerDireccionVariable(paramReferenciaId)
                 self.insertarValorTipo(auxDir, paramReferenciaTipo)
-                self.crearCuadruploParam(True, self.numeroParametro[len(self.numeroParametro) - 1])
+                self.guardarCuadruploParam(True, self.numeroParametro[len(self.numeroParametro) - 1])
                 self.numeroParametro[len(self.numeroParametro) - 1] = self.numeroParametro[len(self.numeroParametro) - 1] + 1
 
             else:
