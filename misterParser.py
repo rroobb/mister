@@ -282,6 +282,8 @@ class misterParser ( Parser ):
 
     semanticaCompuestoAux2 = None
 
+    semanticaCompuestoAux3 = None
+
     terminacionProc = None #Auxiliar para saber si estas en una funcion o en el main
 
     pilaO = [] #Pila de operandos
@@ -923,7 +925,14 @@ class misterParser ( Parser ):
         if stringVariable == None :
             return None
         listaAux = stringVariable.split(".")
-        if len(listaAux) == 1:
+        isInt = False
+        if len(listaAux) == 2:
+            isInt = True
+            try:
+                tempInt = int(listaAux[1])
+            except ValueError:
+                isInt = False
+        if len(listaAux) == 1 or isInt:
             if listaAux[0].find("(") > 0:
                 listaAux[0] = listaAux[0].replace("(", "")
                 if self.claseActual == None:
@@ -1339,6 +1348,53 @@ class misterParser ( Parser ):
                         self.pOper.append(oper)
             else:
                 self.pOper.append(oper)
+
+    def construirValidarCompuesto(self):
+        self.checarId(self.semanticaCompuestoAux)
+        if self.semanticaCompuestoAux2 == None:
+            self.tipoOperando = self.obtenerTipo(self.semanticaCompuestoAux)
+            auxDir = self.obtenerDireccionVariable(self.semanticaCompuestoAux)
+            self.insertarValorTipo(auxDir,self.tipoOperando)
+        elif self.semanticaCompuestoAux3 == None:
+            isInt = True
+            try:
+                tempInt = int(self.semanticaCompuestoAux2)
+            except ValueError:
+                isInt = False
+            if isInt == False:
+                self.checarAtributo(self.semanticaCompuestoAux2)
+                self.tipoOperando = self.obtenerTipo(self.semanticaCompuestoAux + '.' + self.semanticaCompuestoAux2)
+            else:
+                auxTipo = self.obtenerTipo(self.semanticaCompuestoAux)
+                auxTipo = auxTipo.split(',')
+                if len(auxTipo) < 2:
+                    print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " La variable no es una lista" )
+                    self._syntaxErrors = self._syntaxErrors + 1
+                    sys.exit()
+                if int(auxTipo[2]) <= int(self.semanticaCompuestoAux2):
+                    print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Index fuera de rango" )
+                    self._syntaxErrors = self._syntaxErrors + 1
+                    sys.exit()
+                self.tipoOperando = auxTipo[1]
+            auxDir = self.obtenerDireccionVariable(self.semanticaCompuestoAux + '.' + self.semanticaCompuestoAux2)
+            self.insertarValorTipo(auxDir,self.tipoOperando)
+        else:
+            self.checarAtributo(self.semanticaCompuestoAux2)
+            self.tipoOperando = self.obtenerTipo(self.semanticaCompuestoAux + '.' + self.semanticaCompuestoAux2 + '.' + self.semanticaCompuestoAux3)
+            self.tipoOperando = self.tipoOperando.split(',')
+            if len(self.tipoOperando) < 2:
+                print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " La variable no es una lista" )
+                self._syntaxErrors = self._syntaxErrors + 1
+                sys.exit()
+            if int(self.tipoOperando[2]) <= int(self.semanticaCompuestoAux3):
+                print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Index fuera de rango" )
+                self._syntaxErrors = self._syntaxErrors + 1
+                sys.exit()
+            self.tipoOperando = self.tipoOperando[1]
+            auxDir = self.obtenerDireccionVariable(self.semanticaCompuestoAux + '.' + self.semanticaCompuestoAux2 + '.' + self.semanticaCompuestoAux3)
+            self.insertarValorTipo(auxDir,self.tipoOperando)
+
+
 
     def crearCuadruploEscritura(self):
         if self.pilaO:
@@ -2695,6 +2751,7 @@ class misterParser ( Parser ):
                 self.valorAux1()
                 self.semanticaCompuestoAux = None
                 self.semanticaCompuestoAux2 = None
+                self.semanticaCompuestoAux3 = None
 
 
             elif token in [misterParser.CTETEXTO]:
@@ -2783,30 +2840,12 @@ class misterParser ( Parser ):
                 self.llamarFunc()
 
             elif token in [misterParser.Y, misterParser.O, misterParser.IDENTICO, misterParser.COMA, misterParser.SUMA, misterParser.RESTA, misterParser.DIVISION, misterParser.MULTIPLICACION, misterParser.DIFERENTE, misterParser.MAYORIGUAL, misterParser.MENORIGUAL, misterParser.MENOR, misterParser.MAYOR, misterParser.PARENTESIS2, misterParser.CORCHETE2, misterParser.PUNTOYCOMA]:
-                if self.semanticaCompuestoAux2 == None:
-                    self.checarId(self.semanticaCompuestoAux)
-                    self.tipoOperando = self.obtenerTipo(self.semanticaCompuestoAux)
-                    auxDir = self.obtenerDireccionVariable(self.semanticaCompuestoAux)
-                    self.insertarValorTipo(auxDir,self.tipoOperando)
-                else:
-                    self.checarAtributo(self.semanticaCompuestoAux2)
-                    self.tipoOperando = self.obtenerTipo(self.semanticaCompuestoAux + '.' + self.semanticaCompuestoAux2)
-                    auxDir = self.obtenerDireccionVariable(self.semanticaCompuestoAux + '.' + self.semanticaCompuestoAux2)
-                    self.insertarValorTipo(auxDir,self.tipoOperando)
+                self.construirValidarCompuesto()
                 self.enterOuterAlt(localctx, 2)
 
 
             else:
-                if self.semanticaCompuestoAux2 == None:
-                    self.checarId(self.semanticaCompuestoAux)
-                    self.tipoOperando = self.obtenerTipo(self.semanticaCompuestoAux)
-                    auxDir = self.obtenerDireccionVariable(self.semanticaCompuestoAux)
-                    self.insertarValorTipo(auxDir,self.tipoOperando)
-                else:
-                    self.checarAtributo(self.semanticaCompuestoAux2)
-                    self.tipoOperando = self.obtenerTipo(self.semanticaCompuestoAux + '.' + self.semanticaCompuestoAux2)
-                    auxDir = self.obtenerDireccionVariable(self.semanticaCompuestoAux + '.' + self.semanticaCompuestoAux2)
-                    self.insertarValorTipo(auxDir,self.tipoOperando)
+                self.construirValidarCompuesto()
                 raise NoViableAltException(self)
 
         except RecognitionException as re:
@@ -4544,6 +4583,7 @@ class misterParser ( Parser ):
             elif token in [misterParser.CTENTERO]:
                 self.enterOuterAlt(localctx, 2)
                 self.state = 410
+                self.semanticaCompuestoAux2 = self.getCurrentToken().text
                 self.match(misterParser.CTENTERO)
 
             else:
@@ -4595,6 +4635,7 @@ class misterParser ( Parser ):
                 self.state = 413
                 self.match(misterParser.PUNTO)
                 self.state = 414
+                self.semanticaCompuestoAux3 = self.getCurrentToken().text
                 self.match(misterParser.CTENTERO)
 
             elif token in [misterParser.Y, misterParser.O, misterParser.IDENTICO, misterParser.IGUAL, misterParser.COMA, misterParser.SUMA, misterParser.RESTA, misterParser.DIVISION, misterParser.MULTIPLICACION, misterParser.DIFERENTE, misterParser.MAYORIGUAL, misterParser.MENORIGUAL, misterParser.MENOR, misterParser.MAYOR, misterParser.PARENTESIS1, misterParser.PARENTESIS2, misterParser.CORCHETE2, misterParser.PUNTOYCOMA]:
@@ -4659,16 +4700,7 @@ class misterParser ( Parser ):
             self.match(misterParser.ASIGNAR)
             self.state = 419
             self.compuesto()
-            if self.semanticaCompuestoAux2 == None:
-                self.checarId(self.semanticaCompuestoAux)
-                self.tipoOperando = self.obtenerTipo(self.semanticaCompuestoAux)
-                auxDir = self.obtenerDireccionVariable(self.semanticaCompuestoAux)
-                self.insertarValorTipo(auxDir,self.tipoOperando)
-            else:
-                self.checarAtributo(self.semanticaCompuestoAux2)
-                self.tipoOperando = self.obtenerTipo(self.semanticaCompuestoAux + '.' + self.semanticaCompuestoAux2)
-                auxDir = self.obtenerDireccionVariable(self.semanticaCompuestoAux + '.' + self.semanticaCompuestoAux2)
-                self.insertarValorTipo(auxDir,self.tipoOperando)
+            self.construirValidarCompuesto()
             self.state = 420  
             self.match(misterParser.IGUAL)
             self.insertarOperador('=')
