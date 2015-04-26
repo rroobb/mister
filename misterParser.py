@@ -1041,35 +1041,68 @@ class misterParser ( Parser ):
         if stringVariable == None:
             return None
         listaAux = stringVariable.split(".")
-        if len(listaAux) == 1:
+        isInt = False
+        isIntAtrib = False
+        if len(listaAux) == 2:
+            isInt = True
+            try:
+                tempInt = int(listaAux[1])
+            except ValueError:
+                isInt = False
+        elif len(listaAux) == 3:
+            isIntAtrib = True
+            try:
+                tempIntAtrib = int(listaAux[2])
+            except ValueError:
+                isIntAtrib = False
+        
+        if len(listaAux) == 1 or isInt:
             if listaAux[0].find("(") > 0:
                 return None
             else:
                 if self.claseActual == None:
                     if self.funcionActual == None:
                         if self.dirPrincipal["global"][3].get(listaAux[0]):
-                            return self.dirPrincipal["global"][3][listaAux[0]][1]
+                            if isInt:
+                                return self.dirPrincipal["global"][3][listaAux[0]][1] + tempInt
+                            else:
+                                return self.dirPrincipal["global"][3][listaAux[0]][1]
                     else:
                         auxiliar = self.dirPrincipal[self.funcionActual][3].get(listaAux[0])
                         if auxiliar != None:
-                            return auxiliar[1]
+                            if isInt:
+                                return auxiliar[1] + tempInt
+                            else:
+                                return auxiliar[1]
                         else:
                             aux = self.dirPrincipal["global"][3].get(listaAux[0])
                             if aux != None:
-                                return aux[1]
+                                if isInt:
+                                    return aux[1] + tempInt
+                                else:
+                                    return aux[1]
                             else:
-                                return
+                                return None
                 else:
                     if self.funcionActual == None:
                         if self.dirPrincipal[self.claseActual][3].get(listaAux[0]):
-                            return self.dirPrincipal[self.claseActual][3][listaAux[0]][2]
+                            if isInt:
+                                return self.dirPrincipal[self.claseActual][3][listaAux[0]][2] + tempInt
+                            else:
+                                return self.dirPrincipal[self.claseActual][3][listaAux[0]][2]
                     else:
                         auxiliar = self.dirPrincipal[self.claseActual][1][self.funcionActual][1].get(listaAux[0])
                         if auxiliar != None:
-                            return auxiliar[2]
+                            if isInt:
+                                return auxiliar[2] + tempInt
+                            else:
+                                return auxiliar[2]
                         else:
                             if self.dirPrincipal[self.claseActual][3].get(listaAux[0]):
-                                return self.dirPrincipal[self.claseActual][3][listaAux[0]][2]
+                                if isInt:
+                                    return self.dirPrincipal[self.claseActual][3][listaAux[0]][2] + tempInt
+                                else:
+                                    return self.dirPrincipal[self.claseActual][3][listaAux[0]][2]
         else:
             if listaAux[1].find("(") > 0:
                 return None
@@ -1077,19 +1110,31 @@ class misterParser ( Parser ):
             if self.claseActual == None:
                 if self.funcionActual == None:
                     if (self.dirPrincipal['global'][3].get(listaAux[0])) and (self.dirPrincipal['global'][3][listaAux[0]][2].get(listaAux[1])):
-                        return self.dirPrincipal['global'][3][listaAux[0]][2][listaAux[1]][2]
+                        if isIntAtrib:
+                            return self.dirPrincipal['global'][3][listaAux[0]][2][listaAux[1]][2] + tempIntAtrib
+                        else:
+                            return self.dirPrincipal['global'][3][listaAux[0]][2][listaAux[1]][2]
                 else:
                     clase = self.dirPrincipal[self.funcionActual][3].get(listaAux[0])
                     if clase != None:
                         if clase[2].get(listaAux[1]):
-                            return clase[2][listaAux[1]][2]
+                            if isIntAtrib:
+                                return clase[2][listaAux[1]][2] + tempIntAtrib
+                            else:    
+                                return clase[2][listaAux[1]][2]
                     else:
                         if (self.dirPrincipal['global'][3].get(listaAux[0])) and (self.dirPrincipal['global'][3][listaAux[0]][2].get(listaAux[1])):
-                            return self.dirPrincipal['global'][3][listaAux[0]][2][listaAux[1]][2]
+                            if isIntAtrib:
+                                return self.dirPrincipal['global'][3][listaAux[0]][2][listaAux[1]][2] + tempIntAtrib
+                            else:
+                                return self.dirPrincipal['global'][3][listaAux[0]][2][listaAux[1]][2]
             else:
                 if self.funcionActual != None:
                     if (self.dirPrincipal[self.claseActual][1][self.funcionActual][1].get(listaAux[0])) and (self.dirPrincipal[self.claseActual][1][self.funcionActual][1][listaAux[0]][3].get(listaAux[1])):
-                        return self.dirPrincipal[self.claseActual][1][self.funcionActual][1][listaAux[0]][3][listaAux[1]][2]
+                        if isIntAtrib:
+                            return self.dirPrincipal[self.claseActual][1][self.funcionActual][1][listaAux[0]][3][listaAux[1]][2] + tempIntAtrib
+                        else:    
+                            return self.dirPrincipal[self.claseActual][1][self.funcionActual][1][listaAux[0]][3][listaAux[1]][2]
 
     def encontrarTamanioFuncionClase(self, padre, funcion):
         while True:
