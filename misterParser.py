@@ -5112,6 +5112,7 @@ class misterParser ( Parser ):
             self.crearCuadruploCondicion()
             self.state = 455
             self.bloque()
+            self.crearCuadruploCiclo3()
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
