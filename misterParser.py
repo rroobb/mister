@@ -316,6 +316,8 @@ class misterParser ( Parser ):
 
     asignacionRetorno = [] #Para funciones con retorno de variables
 
+    stackCuadruploParam = [] #Temporal para cuadruplos param
+
     cuboSem = cuboSemantico()
 
     quadList = [] #Cuadruplos
@@ -1039,35 +1041,68 @@ class misterParser ( Parser ):
         if stringVariable == None:
             return None
         listaAux = stringVariable.split(".")
-        if len(listaAux) == 1:
+        isInt = False
+        isIntAtrib = False
+        if len(listaAux) == 2:
+            isInt = True
+            try:
+                tempInt = int(listaAux[1])
+            except ValueError:
+                isInt = False
+        elif len(listaAux) == 3:
+            isIntAtrib = True
+            try:
+                tempIntAtrib = int(listaAux[2])
+            except ValueError:
+                isIntAtrib = False
+        
+        if len(listaAux) == 1 or isInt:
             if listaAux[0].find("(") > 0:
                 return None
             else:
                 if self.claseActual == None:
                     if self.funcionActual == None:
                         if self.dirPrincipal["global"][3].get(listaAux[0]):
-                            return self.dirPrincipal["global"][3][listaAux[0]][1]
+                            if isInt:
+                                return self.dirPrincipal["global"][3][listaAux[0]][1] + tempInt
+                            else:
+                                return self.dirPrincipal["global"][3][listaAux[0]][1]
                     else:
                         auxiliar = self.dirPrincipal[self.funcionActual][3].get(listaAux[0])
                         if auxiliar != None:
-                            return auxiliar[1]
+                            if isInt:
+                                return auxiliar[1] + tempInt
+                            else:
+                                return auxiliar[1]
                         else:
                             aux = self.dirPrincipal["global"][3].get(listaAux[0])
                             if aux != None:
-                                return aux[1]
+                                if isInt:
+                                    return aux[1] + tempInt
+                                else:
+                                    return aux[1]
                             else:
-                                return
+                                return None
                 else:
                     if self.funcionActual == None:
                         if self.dirPrincipal[self.claseActual][3].get(listaAux[0]):
-                            return self.dirPrincipal[self.claseActual][3][listaAux[0]][2]
+                            if isInt:
+                                return self.dirPrincipal[self.claseActual][3][listaAux[0]][2] + tempInt
+                            else:
+                                return self.dirPrincipal[self.claseActual][3][listaAux[0]][2]
                     else:
                         auxiliar = self.dirPrincipal[self.claseActual][1][self.funcionActual][1].get(listaAux[0])
                         if auxiliar != None:
-                            return auxiliar[2]
+                            if isInt:
+                                return auxiliar[2] + tempInt
+                            else:
+                                return auxiliar[2]
                         else:
                             if self.dirPrincipal[self.claseActual][3].get(listaAux[0]):
-                                return self.dirPrincipal[self.claseActual][3][listaAux[0]][2]
+                                if isInt:
+                                    return self.dirPrincipal[self.claseActual][3][listaAux[0]][2] + tempInt
+                                else:
+                                    return self.dirPrincipal[self.claseActual][3][listaAux[0]][2]
         else:
             if listaAux[1].find("(") > 0:
                 return None
@@ -1075,19 +1110,31 @@ class misterParser ( Parser ):
             if self.claseActual == None:
                 if self.funcionActual == None:
                     if (self.dirPrincipal['global'][3].get(listaAux[0])) and (self.dirPrincipal['global'][3][listaAux[0]][2].get(listaAux[1])):
-                        return self.dirPrincipal['global'][3][listaAux[0]][2][listaAux[1]][2]
+                        if isIntAtrib:
+                            return self.dirPrincipal['global'][3][listaAux[0]][2][listaAux[1]][2] + tempIntAtrib
+                        else:
+                            return self.dirPrincipal['global'][3][listaAux[0]][2][listaAux[1]][2]
                 else:
                     clase = self.dirPrincipal[self.funcionActual][3].get(listaAux[0])
                     if clase != None:
                         if clase[2].get(listaAux[1]):
-                            return clase[2][listaAux[1]][2]
+                            if isIntAtrib:
+                                return clase[2][listaAux[1]][2] + tempIntAtrib
+                            else:    
+                                return clase[2][listaAux[1]][2]
                     else:
                         if (self.dirPrincipal['global'][3].get(listaAux[0])) and (self.dirPrincipal['global'][3][listaAux[0]][2].get(listaAux[1])):
-                            return self.dirPrincipal['global'][3][listaAux[0]][2][listaAux[1]][2]
+                            if isIntAtrib:
+                                return self.dirPrincipal['global'][3][listaAux[0]][2][listaAux[1]][2] + tempIntAtrib
+                            else:
+                                return self.dirPrincipal['global'][3][listaAux[0]][2][listaAux[1]][2]
             else:
                 if self.funcionActual != None:
                     if (self.dirPrincipal[self.claseActual][1][self.funcionActual][1].get(listaAux[0])) and (self.dirPrincipal[self.claseActual][1][self.funcionActual][1][listaAux[0]][3].get(listaAux[1])):
-                        return self.dirPrincipal[self.claseActual][1][self.funcionActual][1][listaAux[0]][3][listaAux[1]][2]
+                        if isIntAtrib:
+                            return self.dirPrincipal[self.claseActual][1][self.funcionActual][1][listaAux[0]][3][listaAux[1]][2] + tempIntAtrib
+                        else:    
+                            return self.dirPrincipal[self.claseActual][1][self.funcionActual][1][listaAux[0]][3][listaAux[1]][2]
 
     def encontrarTamanioFuncionClase(self, padre, funcion):
         while True:
@@ -1443,11 +1490,17 @@ class misterParser ( Parser ):
         tamAux = self.obtenerTamanioFuncion(nombreFuncion)
         self.quadList.append(['ERA',None,None,tamAux])
 
-    def crearCuadruploParam(self, referencia, numParam):
+    def guardarCuadruploParam(self, referencia, numParam):
         elementoLlamada = self.pilaO[len(self.pilaO) - 1]
         elemParametro = self.obtenerTipoDireccionParametro(self.stackParametros[len(self.stackParametros) - 1], numParam)
         dirParametro = self.obtenerDireccionParametro(elemParametro)
-        self.quadList.append(['PARAM',referencia,dirParametro,elementoLlamada])
+        self.stackCuadruploParam.append(['PARAM',referencia,dirParametro,elementoLlamada])
+
+    def crearCuadruploParam(self):
+        if self.stackCuadruploParam:
+            for x in range(0,self.stackContParametros[len(self.stackContParametros)-1]):
+                quad = self.stackCuadruploParam.pop()
+                self.quadList.append(quad)
 
     def crearCuadruploGosub(self, nombreFuncion):
         dirAux = self.obtenerDireccionFuncion(nombreFuncion)
@@ -3935,11 +3988,12 @@ class misterParser ( Parser ):
             self.numeroDirParametroEntero.append(0)
             self.numeroDirParametroDecimal.append(0)
             self.numeroDirParametroTexto.append(0)
-            self.crearCuadruploEra(self.stackParametros[len(self.stackParametros) - 1])
             self.state = 350
             self.llamarFuncAux1()
             self.state = 351
             self.match(misterParser.PARENTESIS2)
+            self.crearCuadruploEra(self.stackParametros[len(self.stackParametros) - 1])
+            self.crearCuadruploParam()
             self.numeroParametro.pop()
             self.numeroParametroEntero.pop()
             self.numeroParametroDecimal.pop()
@@ -4006,7 +4060,7 @@ class misterParser ( Parser ):
                 self.state = 353
                 self.expresion()
                 self.state = 354
-                self.crearCuadruploParam(False, self.numeroParametro[len(self.numeroParametro) - 1])
+                self.guardarCuadruploParam(False, self.numeroParametro[len(self.numeroParametro) - 1])
                 self.numeroParametro[len(self.numeroParametro) - 1] = self.numeroParametro[len(self.numeroParametro) - 1] + 1
                 self.llamarFuncAux2()
 
@@ -4021,7 +4075,7 @@ class misterParser ( Parser ):
                 auxDir = self.obtenerDireccionVariable(paramReferenciaId)
                 self.insertarValorTipo(auxDir, paramReferenciaTipo)
                 self.state = 358
-                self.crearCuadruploParam(True, self.numeroParametro[len(self.numeroParametro) - 1])
+                self.guardarCuadruploParam(True, self.numeroParametro[len(self.numeroParametro) - 1])
                 self.numeroParametro[len(self.numeroParametro) - 1] = self.numeroParametro[len(self.numeroParametro) - 1] + 1
                 self.llamarFuncAux2()
 
@@ -4144,7 +4198,7 @@ class misterParser ( Parser ):
                 self.enterOuterAlt(localctx, 1)
                 self.state = 369
                 self.expresion()
-                self.crearCuadruploParam(False, self.numeroParametro[len(self.numeroParametro) - 1])
+                self.guardarCuadruploParam(False, self.numeroParametro[len(self.numeroParametro) - 1])
                 self.numeroParametro[len(self.numeroParametro) - 1] = self.numeroParametro[len(self.numeroParametro) - 1] + 1
 
             elif token in [misterParser.REFERENCIA]:
@@ -4157,7 +4211,7 @@ class misterParser ( Parser ):
                 paramReferenciaTipo = self.obtenerTipo(paramReferenciaId)
                 auxDir = self.obtenerDireccionVariable(paramReferenciaId)
                 self.insertarValorTipo(auxDir, paramReferenciaTipo)
-                self.crearCuadruploParam(True, self.numeroParametro[len(self.numeroParametro) - 1])
+                self.guardarCuadruploParam(True, self.numeroParametro[len(self.numeroParametro) - 1])
                 self.numeroParametro[len(self.numeroParametro) - 1] = self.numeroParametro[len(self.numeroParametro) - 1] + 1
 
             else:
