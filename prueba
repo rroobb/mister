@@ -1,21 +1,21 @@
-LISTA ENTERO 10 jeje;
 ENTERO aux = 40;
 CLASE PERSONA {
 	ATRIBUTOS:
 		PUBLICO ENTERO numero3;
 		PUBLICO ENTERO numero4;
-		PUBLICO LISTA ENTERO 3 jeje;
 	METODOS:
 		FUNCION NADA print(ENTERO asdalsd){
 			TEXTO hola;
 			ASIGNAR hola = "hola";
+			IMPRIMIR(hola);
+			IMPRIMIR(asdalsd);
 		}
 };
 
 PERSONA rob;
 
 FUNCION ENTERO print (TEXTO param1, ENTERO parametro1 , DECIMAL parametro2, TEXTO p){
-
+	ASIGNAR parametro1 = 2000;
 	RETORNAR -10;
 	
 }
@@ -26,10 +26,22 @@ FUNCION ENTERO INICIO (ENTERO parametro1 , DECIMAL parametro2) {
 	TEXTO p = "hola";
 	DECIMAL num3;
 	PERSONA aux;
-	ASIGNAR rob.jeje.5 = 5;
-	ASIGNAR num1 = print("hola", jeje.2 , num3, &p);
-	IMPRIMIR(num1);
-
+	rob.print(num1);
+	aux.print(num2);
+	ASIGNAR num1 = print("hola", &num2 , num3, &p);
+	IMPRIMIR(num2);
+	ASIGNAR rob.numero3 = print("hola", &num2 , num3, &p);
+	IMPRIMIR(rob.numero3);
+	SI (num1 < num2){
+		IMPRIMIR("si");
+	}
+	SINO{
+		IMPRIMIR("no");
+	}
+	MIENTRAS (num1 < 0 ){
+		IMPRIMIR(num1);
+		ASIGNAR num1 = num1 + 1;
+	}
 	RETORNAR 0;
 
 }
