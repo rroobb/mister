@@ -272,6 +272,8 @@ class misterParser ( Parser ):
 
     stackContParametros = []
 
+    stackContArgumLlamadaFunc = []
+
     AuxPadre = None
 
     AuxLongLista = None
@@ -626,7 +628,6 @@ class misterParser ( Parser ):
             else:
                 isClase = True
                 
-
         tipo = None
         if self.AuxTipoLista == None and self.AuxTipoVar != "LISTA":
             tipo = self.AuxTipoVar
@@ -1494,13 +1495,25 @@ class misterParser ( Parser ):
 
     def guardarCuadruploParam(self, referencia, numParam):
         elementoLlamada = self.pilaO[len(self.pilaO) - 1]
+        tipoElementoLlamada = self.pTipos[len(self.pTipos) - 1]
         elemParametro = self.obtenerTipoDireccionParametro(self.stackParametros[len(self.stackParametros) - 1], numParam)
         dirParametro = self.obtenerDireccionParametro(elemParametro)
-        self.stackCuadruploParam.append(['PARAM',referencia,dirParametro,elementoLlamada])
+        
+        tipoElementoLlamada = tipoElementoLlamada.split(',')
+        if len(tipoElementoLlamada) == 1:
+            self.stackCuadruploParam.append(['PARAM',referencia,dirParametro,elementoLlamada])
+        else:
+            tamanioLlamada = int(tipoElementoLlamada[2])
+            self.stackContArgumLlamadaFunc[len(self.stackContArgumLlamadaFunc)-1] = self.stackContArgumLlamadaFunc[len(self.stackContArgumLlamadaFunc)-1] + tamanioLlamada - 1
+            while tamanioLlamada > 0:
+                self.stackCuadruploParam.append(['PARAM',referencia,dirParametro,elementoLlamada])
+                dirParametro = dirParametro + 1
+                elementoLlamada = elementoLlamada + 1
+                tamanioLlamada = tamanioLlamada - 1
 
     def crearCuadruploParam(self):
         if self.stackCuadruploParam:
-            for x in range(0,self.stackContParametros[len(self.stackContParametros)-1]):
+            for x in range(0,self.stackContArgumLlamadaFunc[len(self.stackContArgumLlamadaFunc)-1]):
                 quad = self.stackCuadruploParam.pop()
                 self.quadList.append(quad)
 
@@ -1558,6 +1571,7 @@ class misterParser ( Parser ):
             print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " La cantidad de parametros es incorrecta" )
             self._syntaxErrors = self._syntaxErrors + 1
             self.stackContParametros[len(self.stackContParametros)-1] = self.stackContParametros[len(self.stackContParametros)-1] + 1
+            self.stackContArgumLlamadaFunc[len(self.stackContArgumLlamadaFunc)-1] = self.stackContArgumLlamadaFunc[len(self.stackContArgumLlamadaFunc)-1] + 1
             sys.exit()
             return
         if len(listaPar) != 0:
@@ -1568,11 +1582,12 @@ class misterParser ( Parser ):
                     print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " El tipo de parametro es incorrecto" )
                     self._syntaxErrors = self._syntaxErrors + 1
             else:
-                if (tipoParametro[0] != tipoLlamada[0]) or (tipoParametro[1] != tipoLlamada[1]):
+                if (tipoParametro[0] != tipoLlamada[0]) or (tipoParametro[1] != tipoLlamada[1]) or (tipoParametro[2] != tipoLlamada[2]):
                     print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " El tipo de parametro es incorrecto" )
                     self._syntaxErrors = self._syntaxErrors + 1
         
         self.stackContParametros[len(self.stackContParametros)-1] = self.stackContParametros[len(self.stackContParametros)-1] + 1
+        self.stackContArgumLlamadaFunc[len(self.stackContArgumLlamadaFunc)-1] = self.stackContArgumLlamadaFunc[len(self.stackContArgumLlamadaFunc)-1] + 1
         self.pilaO.pop()
         self.pTipos.pop()
 
@@ -1603,6 +1618,7 @@ class misterParser ( Parser ):
                     return
                 self.stackParametros.pop()
                 self.stackContParametros.pop()
+                self.stackContArgumLlamadaFunc.pop()
 
     def programa(self):
 
@@ -2316,6 +2332,7 @@ class misterParser ( Parser ):
             self.match(misterParser.ID)
             auxVariableActual = self.variableActual
             self.insertarVariable()
+            self.AuxTipoLista = None
             self.checarId(auxVariableActual)
             self.tipoOperando = self.obtenerTipo(auxVariableActual)
             auxDir = self.obtenerDireccionVariable(auxVariableActual)
@@ -2384,6 +2401,7 @@ class misterParser ( Parser ):
                 self.match(misterParser.ID)
                 auxVariableActual = self.variableActual
                 self.insertarVariable()
+                self.AuxTipoLista = None
                 self.checarId(auxVariableActual)
                 self.tipoOperando = self.obtenerTipo(auxVariableActual)
                 auxDir = self.obtenerDireccionVariable(auxVariableActual)
@@ -3002,6 +3020,7 @@ class misterParser ( Parser ):
                 self.state = 259
                 self.variableActual = self.getCurrentToken().text
                 self.insertarVariable()
+                self.AuxTipoLista = None
                 self.match(misterParser.ID)
                 self.state = 260
                 self.parametrosAux3()
@@ -3131,6 +3150,7 @@ class misterParser ( Parser ):
                 self.state = 271
                 self.variableActual = self.getCurrentToken().text
                 self.insertarVariable()
+                self.AuxTipoLista = None
                 self.match(misterParser.ID)
                 self.state = 272
                 self.parametrosAux3()
@@ -3978,12 +3998,15 @@ class misterParser ( Parser ):
             self.enterOuterAlt(localctx, 1)
             self.state = 349
             self.match(misterParser.PARENTESIS1)
+            self.pOper.append("era")
             if self.semanticaCompuestoAux != None and self.semanticaCompuestoAux2 != None:
                 self.stackParametros.append(self.semanticaCompuestoAux + "." + self.semanticaCompuestoAux2 + "(")
                 self.stackContParametros.append(0)
+                self.stackContArgumLlamadaFunc.append(0)
             elif self.semanticaCompuestoAux != None:
                 self.stackParametros.append(self.semanticaCompuestoAux + "(")
                 self.stackContParametros.append(0)
+                self.stackContArgumLlamadaFunc.append(0)
             self.numeroParametro.append(0)
             self.numeroParametroEntero.append(0)
             self.numeroParametroDecimal.append(0)
@@ -3995,6 +4018,7 @@ class misterParser ( Parser ):
             self.llamarFuncAux1()
             self.state = 351
             self.match(misterParser.PARENTESIS2)
+            self.pOper.pop()
             self.crearCuadruploEra(self.stackParametros[len(self.stackParametros) - 1])
             self.crearCuadruploParam()
             self.numeroParametro.pop()
