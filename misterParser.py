@@ -1247,7 +1247,8 @@ class misterParser ( Parser ):
                 listaAux[0] = listaAux[0].replace("(", "")
                 if self.claseActual == None:
                     if self.dirPrincipal.get(listaAux[0]):
-                        return self.dirPrincipal[listaAux[0]][5][numParam]
+                        if len(self.dirPrincipal[listaAux[0]][5]) != 0:
+                            return self.dirPrincipal[listaAux[0]][5][numParam]
                 else:
                     return self.encontrarDirParametroFuncionClase(self.claseActual, listaAux[0], numParam)
         else:
@@ -1274,36 +1275,37 @@ class misterParser ( Parser ):
 
     def obtenerDireccionParametro(self, tipoDireccion):
         offset = 0
-        tipoDireccion = tipoDireccion.split(',')
-        if len(tipoDireccion) == 1:
-            if tipoDireccion[0] == 'ENTERO':
-                offset = self.numeroParametroEntero[len(self.numeroParametroEntero) - 1] + self.numeroDirParametroEntero[len(self.numeroDirParametroEntero) - 1]
-                self.numeroParametroEntero[len(self.numeroParametroEntero) - 1] = self.numeroParametroEntero[len(self.numeroParametroEntero) - 1] + 1
-                return 9000 + offset
-            elif tipoDireccion[0] == 'DECIMAL':
-                offset = self.numeroParametroDecimal[len(self.numeroParametroDecimal) - 1] + self.numeroDirParametroDecimal[len(self.numeroDirParametroDecimal) - 1]
-                self.numeroParametroDecimal[len(self.numeroParametroDecimal) - 1] = self.numeroParametroDecimal[len(self.numeroParametroDecimal) - 1] + 1
-                return 15000 + offset
-            elif tipoDireccion[0] == 'TEXTO':
-                offset = self.numeroParametroTexto[len(self.numeroParametroTexto) - 1] + self.numeroDirParametroTexto[len(self.numeroDirParametroTexto) - 1]
-                self.numeroParametroTexto[len(self.numeroParametroTexto) - 1] = self.numeroParametroTexto[len(self.numeroParametroTexto) - 1] + 1
-                return 21000 + offset
-        else:
-            if tipoDireccion[1] == 'ENTERO':
-                offset = self.numeroParametroEntero[len(self.numeroParametroEntero) - 1] + self.numeroDirParametroEntero[len(self.numeroDirParametroEntero) - 1]
-                self.numeroParametroEntero[len(self.numeroParametroEntero) - 1] = self.numeroParametroEntero[len(self.numeroParametroEntero) - 1] + 1
-                self.numeroDirParametroEntero[len(self.numeroDirParametroEntero) - 1] = self.numeroDirParametroEntero[len(self.numeroDirParametroEntero) - 1] + int(tipoDireccion[2]) - 1
-                return 9000 + offset
-            elif tipoDireccion[1] == 'DECIMAL':
-                offset = self.numeroParametroDecimal[len(self.numeroParametroDecimal) - 1] + self.numeroDirParametroDecimal[len(self.numeroDirParametroDecimal) - 1]
-                self.numeroParametroDecimal[len(self.numeroParametroDecimal) - 1] = self.numeroParametroDecimal[len(self.numeroParametroDecimal) - 1] + 1
-                self.numeroDirParametroDecimal[len(self.numeroDirParametroDecimal) - 1] = self.numeroDirParametroDecimal[len(self.numeroDirParametroDecimal) - 1] + int(tipoDireccion[2]) - 1
-                return 15000 + offset
-            elif tipoDireccion[1] == 'TEXTO':
-                offset = self.numeroParametroTexto[len(self.numeroParametroTexto) - 1] + self.numeroDirParametroTexto[len(self.numeroDirParametroTexto) - 1]
-                self.numeroParametroTexto[len(self.numeroParametroTexto) - 1] = self.numeroParametroTexto[len(self.numeroParametroTexto) - 1] + 1
-                self.numeroDirParametroTexto[len(self.numeroDirParametroTexto) - 1] = self.numeroDirParametroTexto[len(self.numeroDirParametroTexto) - 1] + int(tipoDireccion[2]) - 1
-                return 21000 + offset
+        if tipoDireccion != None:
+            tipoDireccion = tipoDireccion.split(',')
+            if len(tipoDireccion) == 1:
+                if tipoDireccion[0] == 'ENTERO':
+                    offset = self.numeroParametroEntero[len(self.numeroParametroEntero) - 1] + self.numeroDirParametroEntero[len(self.numeroDirParametroEntero) - 1]
+                    self.numeroParametroEntero[len(self.numeroParametroEntero) - 1] = self.numeroParametroEntero[len(self.numeroParametroEntero) - 1] + 1
+                    return 9000 + offset
+                elif tipoDireccion[0] == 'DECIMAL':
+                    offset = self.numeroParametroDecimal[len(self.numeroParametroDecimal) - 1] + self.numeroDirParametroDecimal[len(self.numeroDirParametroDecimal) - 1]
+                    self.numeroParametroDecimal[len(self.numeroParametroDecimal) - 1] = self.numeroParametroDecimal[len(self.numeroParametroDecimal) - 1] + 1
+                    return 15000 + offset
+                elif tipoDireccion[0] == 'TEXTO':
+                    offset = self.numeroParametroTexto[len(self.numeroParametroTexto) - 1] + self.numeroDirParametroTexto[len(self.numeroDirParametroTexto) - 1]
+                    self.numeroParametroTexto[len(self.numeroParametroTexto) - 1] = self.numeroParametroTexto[len(self.numeroParametroTexto) - 1] + 1
+                    return 21000 + offset
+            else:
+                if tipoDireccion[1] == 'ENTERO':
+                    offset = self.numeroParametroEntero[len(self.numeroParametroEntero) - 1] + self.numeroDirParametroEntero[len(self.numeroDirParametroEntero) - 1]
+                    self.numeroParametroEntero[len(self.numeroParametroEntero) - 1] = self.numeroParametroEntero[len(self.numeroParametroEntero) - 1] + 1
+                    self.numeroDirParametroEntero[len(self.numeroDirParametroEntero) - 1] = self.numeroDirParametroEntero[len(self.numeroDirParametroEntero) - 1] + int(tipoDireccion[2]) - 1
+                    return 9000 + offset
+                elif tipoDireccion[1] == 'DECIMAL':
+                    offset = self.numeroParametroDecimal[len(self.numeroParametroDecimal) - 1] + self.numeroDirParametroDecimal[len(self.numeroDirParametroDecimal) - 1]
+                    self.numeroParametroDecimal[len(self.numeroParametroDecimal) - 1] = self.numeroParametroDecimal[len(self.numeroParametroDecimal) - 1] + 1
+                    self.numeroDirParametroDecimal[len(self.numeroDirParametroDecimal) - 1] = self.numeroDirParametroDecimal[len(self.numeroDirParametroDecimal) - 1] + int(tipoDireccion[2]) - 1
+                    return 15000 + offset
+                elif tipoDireccion[1] == 'TEXTO':
+                    offset = self.numeroParametroTexto[len(self.numeroParametroTexto) - 1] + self.numeroDirParametroTexto[len(self.numeroDirParametroTexto) - 1]
+                    self.numeroParametroTexto[len(self.numeroParametroTexto) - 1] = self.numeroParametroTexto[len(self.numeroParametroTexto) - 1] + 1
+                    self.numeroDirParametroTexto[len(self.numeroDirParametroTexto) - 1] = self.numeroDirParametroTexto[len(self.numeroDirParametroTexto) - 1] + int(tipoDireccion[2]) - 1
+                    return 21000 + offset
 
         return -1
 
@@ -1558,16 +1560,17 @@ class misterParser ( Parser ):
             self.stackContParametros[len(self.stackContParametros)-1] = self.stackContParametros[len(self.stackContParametros)-1] + 1
             sys.exit()
             return
-        tipoParametro = listaPar[cont].split(',')
-        tipoLlamada = self.pTipos[len(self.pTipos)-1].split(',')
-        if (len(tipoParametro) == 1) or (len(tipoLlamada) == 1):
-            if tipoParametro[0] != tipoLlamada[0]:
-                print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " El tipo de parametro es incorrecto" )
-                self._syntaxErrors = self._syntaxErrors + 1
-        else:
-            if (tipoParametro[0] != tipoLlamada[0]) or (tipoParametro[1] != tipoLlamada[1]):
-                print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " El tipo de parametro es incorrecto" )
-                self._syntaxErrors = self._syntaxErrors + 1
+        if len(listaPar) != 0:
+            tipoParametro = listaPar[cont].split(',')
+            tipoLlamada = self.pTipos[len(self.pTipos)-1].split(',')
+            if (len(tipoParametro) == 1) or (len(tipoLlamada) == 1):
+                if tipoParametro[0] != tipoLlamada[0]:
+                    print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " El tipo de parametro es incorrecto" )
+                    self._syntaxErrors = self._syntaxErrors + 1
+            else:
+                if (tipoParametro[0] != tipoLlamada[0]) or (tipoParametro[1] != tipoLlamada[1]):
+                    print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " El tipo de parametro es incorrecto" )
+                    self._syntaxErrors = self._syntaxErrors + 1
         
         self.stackContParametros[len(self.stackContParametros)-1] = self.stackContParametros[len(self.stackContParametros)-1] + 1
         self.pilaO.pop()

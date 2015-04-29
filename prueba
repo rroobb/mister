@@ -33,7 +33,9 @@ FUNCION ENTERO INICIO (ENTERO parametro1 , DECIMAL parametro2) {
 	ASIGNAR rob.numero3 = print("hola", &num2 , num3, &p);
 	IMPRIMIR(rob.numero3);
 	SI (num1 < num2){
-		IMPRIMIR("si");
+		SI (num2 > num1) {
+			IMPRIMIR("si");
+		}
 	}
 	SINO{
 		IMPRIMIR("no");
