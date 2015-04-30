@@ -938,6 +938,20 @@ class misterParser ( Parser ):
                 break
         return
 
+    def validarElementoEscritura(self):
+        aux = self.pTipos[len(self.pTipos)-1]
+        aux = aux.split(",")
+        if aux[0] not in ["ENTERO", "DECIMAL", "TEXTO", "LISTA"]:
+            print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " No se puede imprimir la variable" )
+            self._syntaxErrors = self._syntaxErrors + 1
+            sys.exit()
+
+    def validarElementoLectura(self, tipo:str):
+        if tipo not in ["ENTERO", "DECIMAL", "TEXTO"]:
+            print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " No se puede hacer la operacion LEER con el tipo de variable" )
+            self._syntaxErrors = self._syntaxErrors + 1
+            sys.exit()
+
     def encontrarTipoAtributoClase(self, padre, atributo):
         while True:
             dictAux = self.dirPrincipal[padre][3]
@@ -5236,6 +5250,7 @@ class misterParser ( Parser ):
             self.match(misterParser.PARENTESIS1)
             self.state = 459
             self.expresion()
+            self.validarElementoEscritura()
             self.crearCuadruploEscritura()
             self.state = 460
             self.escrituraAux1()
@@ -5295,6 +5310,7 @@ class misterParser ( Parser ):
                 self.match(misterParser.COMA)
                 self.state = 465
                 self.expresion()
+                self.validarElementoEscritura()
                 self.crearCuadruploEscritura()
                 self.state = 466
                 self.escrituraAux1()
@@ -5363,6 +5379,7 @@ class misterParser ( Parser ):
             idTempLectura = self.getCurrentToken().text
             self.match(misterParser.ID)
             self.checarId(idTempLectura)
+            self.validarElementoLectura(self.obtenerTipo(idTempLectura))
             leerDirAux = self.obtenerDireccionVariable(idTempLectura)
             self.crearCuadruploLectura(leerDirAux)
             self.state = 474
