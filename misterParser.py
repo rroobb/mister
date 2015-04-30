@@ -1435,10 +1435,25 @@ class misterParser ( Parser ):
                             elif tipoCuadruplo == 'asignacion':
                                 self.quadList.append([oper,oDer,None,oIzq])
                         else:
-                            print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Tipos de operandos no compatibles" )
-                            self._syntaxErrors = self._syntaxErrors + 1
-                            sys.exit()
-                            return
+                            oDerTipo = oDerTipo.split(',')
+                            oIzqTipo = oIzqTipo.split(',')
+                            if (len(oDerTipo) != 3) or (len(oIzqTipo) != 3):
+                                print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Tipos de operandos no compatibles" )
+                                self._syntaxErrors = self._syntaxErrors + 1
+                                sys.exit()
+                                return
+                            elif (oDerTipo[1] != oIzqTipo[1]) or (oDerTipo[2] != oIzqTipo[2]) or (tipoCuadruplo != 'asignacion'):
+                                print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Tipos de operandos no compatibles" )
+                                self._syntaxErrors = self._syntaxErrors + 1
+                                sys.exit()
+                                return
+                            else:
+                                tamanio = int(oDerTipo[2])
+                                while tamanio > 0:
+                                    self.quadList.append([oper,oDer,None,oIzq])
+                                    oDer = oDer + 1
+                                    oIzq = oIzq + 1
+                                    tamanio = tamanio - 1
                     else:
                         self.pilaO.append(oDer)
                         self.pTipos.append(oDerTipo)
