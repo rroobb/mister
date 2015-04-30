@@ -578,6 +578,7 @@ class misterParser ( Parser ):
             sys.exit()
             return
         self.contCteL = 0
+    
     def validarElementoCteLista(self):
         if self.pTipos[len(self.pTipos)- 1] != self.tipoListaAux[1]:
             print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Tipo de elemento incompatible con la lista" )
@@ -593,6 +594,27 @@ class misterParser ( Parser ):
             sys.exit()
             return
         self.tipoListaAux = None
+
+    def asignarLista(self):
+        stackAuxElementos = []
+        while self.contCteL > 0:
+            stackAuxElementos.append(self.pilaO.pop())
+            self.pTipos.pop()
+            self.contCteL = self.contCteL - 1
+
+        lista = self.pilaO.pop()
+        self.pTipos.pop()
+        auxCont = len(stackAuxElementos)
+        while auxCont > 0:
+            elemento = None
+            if stackAuxElementos:
+                elemento = stackAuxElementos.pop()
+            self.quadList.append(["=",elemento,None,lista])
+            lista = lista + 1
+            auxCont = auxCont - 1
+
+        self.pOper.pop()
+        self.pOper.pop()
 
     def insertarVariable(self):
         direccion = None
@@ -2705,6 +2727,7 @@ class misterParser ( Parser ):
             self.enterOuterAlt(localctx, 1)
             self.state = 230
             self.match(misterParser.CORCHETE1)
+            self.pOper.append("lista")
             self.validarAsignarLista();
             self.state = 231
             self.valor()
@@ -2714,6 +2737,7 @@ class misterParser ( Parser ):
             self.state = 233
             self.match(misterParser.CORCHETE2)
             self.validarLongitudLista()
+            self.asignarLista()
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
