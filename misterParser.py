@@ -272,6 +272,8 @@ class misterParser ( Parser ):
 
     stackContParametros = []
 
+    tipoListaAux = None
+
     AuxPadre = None
 
     AuxLongLista = None
@@ -564,6 +566,31 @@ class misterParser ( Parser ):
             return
         self.dirPrincipal[self.claseActual] = [None, {}, self.AuxPadre, {}, None, None, None, [0,0,0]]
         self.AuxPadre = None
+
+    def validarAsignarLista(self):
+        self.tipoListaAux = self.pTipos(len(self.pTipos)- 1)
+        self.tipoListaAux = self.tipoListaAux.split(',')
+        if self.tipoListaAux[0] != "LISTA":
+            print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " La variable no es una lista" )
+            self._syntaxErrors = self._syntaxErrors + 1
+            sys.exit()
+            return
+        self.contCteL = 0
+    def validarElementoCteLista(self):
+        if self.pTipos(len(self.pTipos)- 1) != self.tipoListaAux[1]:
+            print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Tipo de elemento incompatible con la lista" )
+            self._syntaxErrors = self._syntaxErrors + 1
+            sys.exit()
+            return
+        self.contCteL = self.contCteL + 1
+
+    def validarLongitudLista(self):
+        if int(self.contCteL) > int(self.tipoListaAux[2]):
+            print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " La variable no es una lista" )
+            self._syntaxErrors = self._syntaxErrors + 1
+            sys.exit()
+            return
+        self.tipoListaAux = None
 
     def insertarVariable(self):
         direccion = None
@@ -2655,12 +2682,15 @@ class misterParser ( Parser ):
             self.enterOuterAlt(localctx, 1)
             self.state = 230
             self.match(misterParser.CORCHETE1)
+            self.validarAsignarLista();
             self.state = 231
             self.valor()
+            self.validarElementoCteLista()
             self.state = 232
             self.cteLAux1()
             self.state = 233
             self.match(misterParser.CORCHETE2)
+            self.validarLongitudLista()
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -2713,6 +2743,7 @@ class misterParser ( Parser ):
                 self.match(misterParser.COMA)
                 self.state = 236
                 self.valor()
+                self.validarElementoCteLista()
                 self.state = 237
                 self.cteLAux1()
 
