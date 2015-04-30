@@ -271,7 +271,7 @@ class misterParser ( Parser ):
     stackParametros = []
 
     stackContParametros = []
-    
+
     tipoListaAux = None
 
     stackContArgumLlamadaFunc = []
@@ -570,7 +570,7 @@ class misterParser ( Parser ):
         self.AuxPadre = None
 
     def validarAsignarLista(self):
-        self.tipoListaAux = self.pTipos(len(self.pTipos)- 1)
+        self.tipoListaAux = self.pTipos[len(self.pTipos)- 1]
         self.tipoListaAux = self.tipoListaAux.split(',')
         if self.tipoListaAux[0] != "LISTA":
             print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " La variable no es una lista" )
@@ -579,7 +579,7 @@ class misterParser ( Parser ):
             return
         self.contCteL = 0
     def validarElementoCteLista(self):
-        if self.pTipos(len(self.pTipos)- 1) != self.tipoListaAux[1]:
+        if self.pTipos[len(self.pTipos)- 1] != self.tipoListaAux[1]:
             print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Tipo de elemento incompatible con la lista" )
             self._syntaxErrors = self._syntaxErrors + 1
             sys.exit()
@@ -588,7 +588,7 @@ class misterParser ( Parser ):
 
     def validarLongitudLista(self):
         if int(self.contCteL) > int(self.tipoListaAux[2]):
-            print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " La variable no es una lista" )
+            print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " La longitud de la lista es menor al numero de elementos declarados" )
             self._syntaxErrors = self._syntaxErrors + 1
             sys.exit()
             return
@@ -2649,6 +2649,11 @@ class misterParser ( Parser ):
             self.tipo()
             self.state = 228
             self.AuxTamanioLista = self.getCurrentToken().text
+            if int(self.AuxTamanioLista) < 1:
+                print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Cantidad de elementos incorrecta" )
+                self._syntaxErrors = self._syntaxErrors + 1
+                sys.exit()
+                return
             self.match(misterParser.CTENTERO)
         except RecognitionException as re:
             localctx.exception = re
