@@ -964,13 +964,13 @@ class misterParser ( Parser ):
         aux = self.pTipos[len(self.pTipos)-1]
         aux = aux.split(",")
         if aux[0] not in ["ENTERO", "DECIMAL", "TEXTO", "LISTA"]:
-            print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " No se puede imprimir la variable" )
+            print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " No se puede imprimir el tipo de variable" )
             self._syntaxErrors = self._syntaxErrors + 1
             sys.exit()
 
     def validarElementoLectura(self, tipo:str):
         if tipo not in ["ENTERO", "DECIMAL", "TEXTO"]:
-            print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " No se puede hacer la operacion LEER con el tipo de variable" )
+            print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " No se puede leer el tipo de variable" )
             self._syntaxErrors = self._syntaxErrors + 1
             sys.exit()
 
@@ -1526,7 +1526,15 @@ class misterParser ( Parser ):
         if self.pilaO:
             elemento = self.pilaO.pop()
             elementoTipo = self.pTipos.pop()
-            self.quadList.append(['escribir',None,None,elemento])
+            elementoTipo = elementoTipo.split(',')
+            if len(elementoTipo) == 1:
+                self.quadList.append(['escribir',None,None,elemento])
+            else:
+                tamanio = int(elementoTipo[2])
+                while tamanio > 0:
+                    self.quadList.append(['escribir',None,None,elemento])
+                    elemento = elemento + 1
+                    tamanio = tamanio - 1
 
     def crearCuadruploLectura(self,elemento):
         self.quadList.append(['leer',None,None,elemento])

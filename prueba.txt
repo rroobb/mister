@@ -10,6 +10,7 @@ FUNCION ENTERO INICIO (ENTERO parametro1 , DECIMAL parametro2) {
 	ASIGNAR y = AREA(1.0,3.0);
 	IMPRIMIR(y);
 	ASIGNAR m = x;
+	IMPRIMIR(m);
 	RETORNAR 0;
 
 }
