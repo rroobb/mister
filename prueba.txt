@@ -7,7 +7,7 @@ FUNCION ENTERO INICIO (ENTERO parametro1 , DECIMAL parametro2) {
 	LISTA DECIMAL 2 x = [z,1.0];
 	DECIMAL y;
 	LISTA DECIMAL 2 m;
-	ASIGNAR y = AREA(1.0,3.0);
+	ASIGNAR y = m.parametro1;
 	IMPRIMIR(y);
 	ASIGNAR m = x;
 	IMPRIMIR(m);

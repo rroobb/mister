@@ -3,6 +3,7 @@ CLASE PERSONA {
 	ATRIBUTOS:
 		PUBLICO ENTERO numero3;
 		PUBLICO ENTERO numero4;
+		PUBLICO LISTA ENTERO 3 lista;
 	METODOS:
 		FUNCION NADA print(ENTERO asdalsd){
 			TEXTO hola;
@@ -23,6 +24,7 @@ FUNCION ENTERO INICIO (ENTERO parametro1 , DECIMAL parametro2) {
 
 	ENTERO num1 = 5;
 	ENTERO num2 = 4;
+	LISTA ENTERO 3 lista;
 	TEXTO p = "hola";
 	DECIMAL num3;
 	PERSONA aux;
@@ -30,8 +32,8 @@ FUNCION ENTERO INICIO (ENTERO parametro1 , DECIMAL parametro2) {
 	aux.print(num2);
 	ASIGNAR num1 = print("hola", &num2 , num3, &p);
 	IMPRIMIR(num2);
-	ASIGNAR rob.numero3 = print("hola", &num2 , num3, &p);
-	IMPRIMIR(rob.numero3);
+	ASIGNAR rob.lista.num1 = print("hola", &num2 , num3, &p);
+	IMPRIMIR(lista.num2);
 	SI (num1 < num2){
 		SI (num2 > num1) {
 			IMPRIMIR("si");
