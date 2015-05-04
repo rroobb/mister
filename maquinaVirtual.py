@@ -295,6 +295,25 @@ class maquinaVirtual:
 
 	def guardarDirRetornar(self):
 		self.stackRetornos.append(self.cuadruplos[self.InstruccionIndex][3])
+
+	def validarIndex(self):
+		longLista = self.cuadruplos[self.InstruccionIndex][1][0]
+		aux1 = None
+		if type(self.cuadruplos[self.InstruccionIndex][2]) is int:
+			indexs = self.obtenerDireccion(self.cuadruplos[self.InstruccionIndex][2])
+			aux1 = self.memoria[indexs[0]][indexs[1]][indexs[2]]
+
+		elif type(self.cuadruplos[self.InstruccionIndex][2]) is list:
+			aux1 = self.cuadruplos[self.InstruccionIndex][2][0]
+			if type(aux1) is list:
+				indexs = self.obtenerDireccion(aux1[0])
+				aux1 = self.memoria[indexs[0]][indexs[1]][indexs[2]]
+				indexs = self.obtenerDireccion(aux1)
+				aux1 = self.memoria[indexs[0]][indexs[1]][indexs[2]]
+		if aux1 < 0 or aux1 >= longLista:
+			print ("Error en tiempo de ejecucion: Indice fuera de rango" )
+			sys.exit()
+
 #ERA, null, null, [contEnteros,contDecimales,contTextos]
 
 #PARAM, true/false referencia, DirFuncionLocal, DirLLamada/[constante]
@@ -342,6 +361,8 @@ class maquinaVirtual:
 				self.retornar()
 			elif self.cuadruplos[self.InstruccionIndex][0] == "asignacionRetorno":
 				self.guardarDirRetornar()
+			elif self.cuadruplos[self.InstruccionIndex][0] == 'validarIndex':
+				self.validarIndex()
 			self.InstruccionIndex = self.InstruccionIndex + 1
 
 
