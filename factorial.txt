@@ -1,0 +1,16 @@
+FUNCION ENTERO INICIO () {
+	ENTERO num, fact = 1, i;
+	
+	ASIGNAR i = 2;
+	LEER(num);
+	
+	MIENTRAS(i <= num) {
+		ASIGNAR fact = fact * i;
+		ASIGNAR i = i + 1;
+	}
+	
+	IMPRIMIR("Factorial es:");
+	IMPRIMIR(fact);
+	
+	RETORNAR 0;
+}

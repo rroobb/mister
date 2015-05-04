@@ -1,0 +1,18 @@
+FUNCION ENTERO INICIO () {
+	ENTERO n, i = 2, first = 1, second = 1, fibo = 1;
+	
+	LEER(n);
+	
+	SI(n > 0) {
+		IMPRIMIR(first);
+		MIENTRAS(i <= n) {
+			IMPRIMIR(fibo);
+			ASIGNAR fibo = first + second;
+			ASIGNAR first = second;
+			ASIGNAR second = fibo;
+			ASIGNAR i = i + 1;
+		}
+	}
+	
+	RETORNAR 0;
+}

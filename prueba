@@ -16,21 +16,21 @@ CLASE PERSONA {
 PERSONA rob;
 
 FUNCION ENTERO print (TEXTO param1, ENTERO parametro1 , DECIMAL parametro2, TEXTO p){
-	ASIGNAR parametro1 = 2000;
-	RETORNAR -10;
+	ASIGNAR parametro1 = 2;
+	RETORNAR 1;
 	
 }
 FUNCION ENTERO INICIO (ENTERO parametro1 , DECIMAL parametro2) {
 
-	ENTERO num1 = 5;
-	ENTERO num2 = 4;
+	ENTERO num1 = 1;
+	ENTERO num2 = 1;
 	LISTA ENTERO 3 lista;
 	TEXTO p = "hola";
 	DECIMAL num3;
 	PERSONA aux;
 	rob.print(num1);
 	aux.print(num2);
-	ASIGNAR num1 = print("hola", &num2 , num3, &p);
+	ASIGNAR num1 = print("hola" + " jeje", &num2 , num3, &p);
 	IMPRIMIR(num2);
 	ASIGNAR rob.lista.num1 = print("hola", &num2 , num3, &p);
 	IMPRIMIR(lista.num2);
