@@ -1163,11 +1163,12 @@ class misterParser ( Parser ):
                             else:
                                 return auxiliar[2]
                         else:
-                            if self.dirPrincipal[self.claseActual][3].get(listaAux[0]):
+                            auxiliar = self.dirPrincipal[self.claseActual][3].get(listaAux[0])
+                            if auxiliar != None:
                                 if isInt:
-                                    return self.dirPrincipal[self.claseActual][3][listaAux[0]][2] + tempInt
+                                    return auxiliar[2] + tempInt
                                 else:
-                                    return self.dirPrincipal[self.claseActual][3][listaAux[0]][2]
+                                    return auxiliar[2]
         else:
             if listaAux[1].find("(") > 0:
                 return None
@@ -1188,11 +1189,14 @@ class misterParser ( Parser ):
                             else:    
                                 return clase[2][listaAux[1]][2]
                     else:
-                        if (self.dirPrincipal['global'][3].get(listaAux[0])) and (self.dirPrincipal['global'][3][listaAux[0]][2].get(listaAux[1])):
-                            if isIntAtrib:
-                                return self.dirPrincipal['global'][3][listaAux[0]][2][listaAux[1]][2] + tempIntAtrib
-                            else:
-                                return self.dirPrincipal['global'][3][listaAux[0]][2][listaAux[1]][2]
+                        atribsAux1 = self.dirPrincipal['global'][3].get(listaAux[0])
+                        if atribsAux1 != None:
+                            atribsAux = atribsAux1[2].get(listaAux[1])
+                            if atribsAux != None:
+                                if isIntAtrib:
+                                    return atribsAux[2] + tempIntAtrib
+                                else:
+                                    return atribsAux[2]
             else:
                 if self.funcionActual != None:
                     if (self.dirPrincipal[self.claseActual][1][self.funcionActual][1].get(listaAux[0])) and (self.dirPrincipal[self.claseActual][1][self.funcionActual][1][listaAux[0]][3].get(listaAux[1])):
@@ -1487,6 +1491,29 @@ class misterParser ( Parser ):
                 return True
         return False
 
+    def sumarDirsYValidar(self,lista,indice):
+        listaDir = self.obtenerDireccionVariable(lista)
+        indiceDir = self.obtenerDireccionVariable(indice)
+        listaTipo = self.obtenerTipo(lista)
+        indiceTipo = self.obtenerTipo(indice)
+
+        listaTipo = listaTipo.split(',')
+        res = listaTipo[1]
+
+        if res == "ENTERO":
+            self.memLocalEntero = self.memLocalEntero + 1
+            auxDireccion = self.memLocalEntero
+        elif res == "DECIMAL":
+            self.memLocalDecimal = self.memLocalDecimal + 1
+            auxDireccion = self.memLocalDecimal
+        elif res == "TEXTO":
+            self.memLocalTexto = self.memLocalTexto + 1
+            auxDireccion = self.memLocalTexto
+        
+        self.quadList.append(['+',[int(listaDir)],indiceDir,auxDireccion])
+        self.insertarValorTipo([[auxDireccion]],res)
+        self.quadList.append(['validarIndex',[int(listaTipo[2])],indiceDir,listaDir])
+
     def construirValidarCompuesto(self):
         self.checarId(self.semanticaCompuestoAux)
         if self.semanticaCompuestoAux2 == None:
@@ -1508,8 +1535,8 @@ class misterParser ( Parser ):
                     self.checarAtributo(self.semanticaCompuestoAux2)
                     self.tipoOperando = self.obtenerTipo(self.semanticaCompuestoAux + '.' + self.semanticaCompuestoAux2)
                 else:
-                    print("listaConVar")
                     #generar cuadruplo para suma de direcciones y otro para validar INDEX
+                    self.sumarDirsYValidar(self.semanticaCompuestoAux,self.semanticaCompuestoAux2)
             else:
                 auxTipo = self.obtenerTipo(self.semanticaCompuestoAux)
                 auxTipo = auxTipo.split(',')
@@ -1523,8 +1550,8 @@ class misterParser ( Parser ):
                     self._syntaxErrors = self._syntaxErrors + 1
                     sys.exit()
                 self.tipoOperando = auxTipo[1]
-            auxDir = self.obtenerDireccionVariable(self.semanticaCompuestoAux + '.' + self.semanticaCompuestoAux2)
-            self.insertarValorTipo(auxDir,self.tipoOperando)
+                auxDir = self.obtenerDireccionVariable(self.semanticaCompuestoAux + '.' + self.semanticaCompuestoAux2)
+                self.insertarValorTipo(auxDir,self.tipoOperando)
         else:
             self.checarAtributo(self.semanticaCompuestoAux2)
             self.tipoOperando = self.obtenerTipo(self.semanticaCompuestoAux + '.' + self.semanticaCompuestoAux2 + '.' + self.semanticaCompuestoAux3)
@@ -1548,12 +1575,12 @@ class misterParser ( Parser ):
                     print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Indice fuera de rango" )
                     self._syntaxErrors = self._syntaxErrors + 1
                     sys.exit()
+                self.tipoOperando = self.tipoOperando[1]
+                auxDir = self.obtenerDireccionVariable(self.semanticaCompuestoAux + '.' + self.semanticaCompuestoAux2 + '.' + self.semanticaCompuestoAux3)
+                self.insertarValorTipo(auxDir,self.tipoOperando)
             else:
-                print("ClaseListaConVar")
-                    #generar cuadruplo para suma de direcciones y otro para validar INDEX
-            self.tipoOperando = self.tipoOperando[1]
-            auxDir = self.obtenerDireccionVariable(self.semanticaCompuestoAux + '.' + self.semanticaCompuestoAux2 + '.' + self.semanticaCompuestoAux3)
-            self.insertarValorTipo(auxDir,self.tipoOperando)
+                #generar cuadruplo para suma de direcciones y otro para validar INDEX
+                self.sumarDirsYValidar(self.semanticaCompuestoAux + '.' + self.semanticaCompuestoAux2,self.semanticaCompuestoAux3)
 
 
 

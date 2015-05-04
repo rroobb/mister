@@ -10,7 +10,7 @@ def main(argv):
     stream = CommonTokenStream(lexer)
     parser = misterParser(stream)
     tree = parser.programa()
-    #print(parser.quadList)
+    print(parser.quadList)
     #print(parser.dirPrincipal)
     #if parser._syntaxErrors == 0:
         #maquina = maquinaVirtual(parser.dirPrincipal, parser.quadList, parser.memGlobalEntero+1, parser.memGlobalDecimal-2999, parser.memGlobalTexto-5999, parser.dirPrincipal['INICIO'][7][0], parser.dirPrincipal['INICIO'][7][1], parser.dirPrincipal['INICIO'][7][2])
