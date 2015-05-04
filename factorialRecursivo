@@ -1,0 +1,17 @@
+
+FUNCION ENTERO factorial(ENTERO n){
+	ENTERO temp;
+	SI (n <= 1){
+		ASIGNAR temp = n;
+	}
+	SINO{
+		ASIGNAR n = n - 1;
+		ASIGNAR temp = n * factorial(n);
+	}
+	RETORNAR temp;
+} 
+
+FUNCION ENTERO INICIO () {
+	IMPRIMIR(factorial(4));
+	RETORNAR 0;
+}

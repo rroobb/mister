@@ -4,10 +4,11 @@ FUNCION DECIMAL AREA(DECIMAL w, DECIMAL h) {
 
 FUNCION ENTERO INICIO (ENTERO parametro1 , DECIMAL parametro2) {
 	DECIMAL z = 2.0;
-	LISTA DECIMAL 2 x = [z,1.0];
+	LISTA DECIMAL 2 x = [z,-1.0];
 	DECIMAL y;
 	LISTA DECIMAL 2 m;
-	ASIGNAR y = m.parametro1;
+	ASIGNAR parametro1 = 3;
+	ASIGNAR y = x.1;
 	IMPRIMIR(y);
 	ASIGNAR m = x;
 	IMPRIMIR(m);
