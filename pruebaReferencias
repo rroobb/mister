@@ -1,0 +1,12 @@
+FUNCION NADA referencias(LISTA ENTERO 5 lista){
+	ASIGNAR lista = [-1,-2,-3,-4,-5];
+} 
+
+FUNCION ENTERO INICIO () {
+	LISTA ENTERO 5 lista = [1,2,3,4,5];
+	referencias(lista);
+	IMPRIMIR(lista);
+	referencias(&lista);
+	IMPRIMIR(lista);
+	RETORNAR 0;
+}
