@@ -1,0 +1,48 @@
+CLASE figura {
+	ATRIBUTOS:
+		PUBLICO TEXTO nombre;
+	
+	METODOS:
+		FUNCION NADA printNombre(TEXTO n) {
+			IMPRIMIR(n);
+		}
+};
+
+CLASE cuadrado HEREDA figura {
+	ATRIBUTOS:
+		PUBLICO DECIMAL lado;
+	
+	METODOS:
+		FUNCION DECIMAL area(DECIMAL l) {
+			RETORNAR l*l;
+		}
+};
+
+CLASE triangulo HEREDA figura {
+	ATRIBUTOS:
+		PUBLICO DECIMAL ancho;
+		PUBLICO DECIMAL alto;
+	
+	METODOS:
+		FUNCION DECIMAL area(DECIMAL w, DECIMAL h) {
+			RETORNAR w*h/2;
+		}
+};
+
+FUNCION ENTERO INICIO () {
+	cuadrado c;
+	triangulo t;
+	
+	ASIGNAR c.nombre = "cuadrado";
+	ASIGNAR c.lado = 5.0;
+	ASIGNAR t.nombre = "triangulo";
+	ASIGNAR t.ancho = 4.0;
+	ASIGNAR t.alto = 3.0;
+	
+	c.printNombre(c.nombre);
+	IMPRIMIR(c.area(c.lado));
+	t.printNombre(t.nombre);
+	IMPRIMIR(t.area(t.ancho,t.alto));
+	
+	RETORNAR 0;
+}

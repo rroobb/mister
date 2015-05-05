@@ -1,0 +1,10 @@
+FUNCION ENTERO area(ENTERO w, ENTERO h) {
+	RETORNAR w * h;
+}
+
+FUNCION ENTERO INICIO () {
+	ENTERO n = 1;
+	IMPRIMIR (-n * area(3,2));
+	
+	RETORNAR 0;
+}

@@ -1,0 +1,55 @@
+CLASE servivo {
+	ATRIBUTOS:
+		PRIVADO TEXTO nombre;
+	
+	METODOS:
+		FUNCION NADA setNombre(TEXTO n) {
+			ASIGNAR nombre = n;
+		}
+		
+		FUNCION TEXTO getNombre() {
+			RETORNAR nombre;
+		}
+};
+
+CLASE persona HEREDA servivo {
+	ATRIBUTOS:
+		PRIVADO ENTERO edad;
+	
+	METODOS:
+		FUNCION NADA setEdad(ENTERO e) {
+			ASIGNAR edad = e;
+		}
+		
+		FUNCION ENTERO getEdad() {
+			RETORNAR edad;
+		}
+};
+
+CLASE animal HEREDA servivo {
+	ATRIBUTOS:
+		PUBLICO TEXTO raza;
+	
+	METODOS:
+		FUNCION NADA print() {
+			IMPRIMIR(raza);
+		}
+};
+
+FUNCION ENTERO INICIO () {
+	persona p;
+	animal a;
+	
+	p.setNombre("George");
+	p.setEdad(2);
+	
+	a.setNombre("Duque");
+	ASIGNAR a.raza  = "Perro";
+	
+	IMPRIMIR(p.getNombre());
+	IMPRIMIR(p.getEdad());
+	IMPRIMIR(a.getNombre());
+	a.print();
+	
+	RETORNAR 0;
+}
