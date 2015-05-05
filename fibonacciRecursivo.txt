@@ -1,0 +1,30 @@
+FUNCION ENTERO fibonacci(ENTERO n, ENTERO f, ENTERO s) {
+	ENTERO temp;
+	SI(n == 0) {
+		ASIGNAR temp = f;
+	}
+	SINO { 
+		SI(n == 1) {
+			ASIGNAR temp = s;
+		}
+		SINO {
+			ASIGNAR temp = fibonacci(n - 1, s, f + s);
+		}
+	}
+	 
+	RETORNAR temp;
+}
+
+FUNCION ENTERO INICIO () {
+	ENTERO n, fibo, i = 1;
+	
+	LEER(n);
+	
+	MIENTRAS(i<=n) {
+		ASIGNAR fibo = fibonacci(i, 0, 1);
+		IMPRIMIR(fibo);
+		ASIGNAR i = i + 1;
+	}
+	
+	RETORNAR 0;
+}
