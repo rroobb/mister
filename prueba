@@ -13,6 +13,18 @@ CLASE PERSONA {
 		}
 };
 
+CLASE MUJER HEREDA PERSONA {
+	ATRIBUTOS:
+		PUBLICO ENTERO edad;
+	METODOS:
+		FUNCION NADA jeje(ENTERO asdalsd){
+			TEXTO hola;
+			ASIGNAR hola = "hola";
+			IMPRIMIR(hola);
+			IMPRIMIR(asdalsd);
+		}
+};
+
 PERSONA rob;
 
 FUNCION ENTERO print (TEXTO param1, ENTERO parametro1 , DECIMAL parametro2, TEXTO p){
@@ -21,7 +33,7 @@ FUNCION ENTERO print (TEXTO param1, ENTERO parametro1 , DECIMAL parametro2, TEXT
 	
 }
 FUNCION ENTERO INICIO (ENTERO parametro1 , DECIMAL parametro2) {
-
+	MUJER marialicia;
 	ENTERO num1 = 1;
 	ENTERO num2 = 1;
 	LISTA ENTERO 3 lista;
@@ -30,10 +42,11 @@ FUNCION ENTERO INICIO (ENTERO parametro1 , DECIMAL parametro2) {
 	PERSONA aux;
 	rob.print(num1);
 	aux.print(num2);
+	marialicia.jeje(2);
+	marialicia.print(3);
 	ASIGNAR num1 = print("hola" + " jeje", &num2 , num3, &p);
 	IMPRIMIR(num2);
 	ASIGNAR rob.lista.num1 = print("hola", &num2 , num3, &p);
-	IMPRIMIR(lista.num2);
 	SI (num1 < num2){
 		SI (num2 > num1) {
 			IMPRIMIR("si");

@@ -1,4 +1,0 @@
-  {'INICIO': ['ENTERO', None, None, {'num2': ['ENTERO', 6], 'num1': ['ENTERO', 5], 'num3': ['ENTERO', 7], 'parametro2': ['DECIMAL', 5], 'milista': ['LISTA,TEXTO', 0], 'parametro1': ['ENTERO', 4], 'string': ['TEXTO', 1]}], 
-  'global': [None, None, None, {'HOLA': ['DECIMAL', 2], 'numero': ['ENTERO', 0]}], 
-  'PERSONA': [None, {'PRINT': ['ENTERO', {}]}, None, {'numero2': ['DECIMAL', 'PRIVADO', 1], 'numero': ['ENTERO', 'PUBLICO', 3]}],
-   'AREA': ['DECIMAL', None, None, {'altura': ['DECIMAL', 4], 'base': ['DECIMAL', 3]}]}

@@ -1205,18 +1205,18 @@ class misterParser ( Parser ):
                         else:    
                             return self.dirPrincipal[self.claseActual][1][self.funcionActual][1][listaAux[0]][3][listaAux[1]][2]
 
-    def encontrarTamanioFuncionClase(self, padre, funcion):
+    def encontrarClasePadreEra(self, padre, funcion):
         while True:
             dictAux = self.dirPrincipal[padre][1]
             value = dictAux.get(funcion)
             if value != None:
-                return value[5]
+                return padre #value[5]
             padre = self.dirPrincipal[padre][2]
             if padre == None:
                 break
         return
 
-    def obtenerTamanioFuncion(self, stringFuncion):
+    def obtenerClaseFuncionEra(self, stringFuncion):
         if stringFuncion == None:
             return None
         listaAux = stringFuncion.split(".")
@@ -1225,9 +1225,9 @@ class misterParser ( Parser ):
                 listaAux[0] = listaAux[0].replace("(", "")
                 if self.claseActual == None:
                     if self.dirPrincipal.get(listaAux[0]):
-                        return self.dirPrincipal[listaAux[0]][7]
+                        return None #self.dirPrincipal[listaAux[0]][7]
                 else:
-                    return encontrarTamanioFuncionClase(self.claseActual, listaAux[0])
+                    return encontrarClasePadreEra(self.claseActual, listaAux[0])
         else:
             if self.claseActual == None:
                 if self.funcionActual == None:
@@ -1242,14 +1242,14 @@ class misterParser ( Parser ):
                         if clase != None:
                             clase = clase[0]
                         else:
-                            return
+                            return None
             else:
                 if self.funcionActual != None:
                     if self.dirPrincipal[self.claseActual][1][self.funcionActual][1].get(listaAux[0]):
                         clase = self.dirPrincipal[self.claseActual][1][self.funcionActual][1][listaAux[0]][0]
 
             if listaAux[1].find("(") > 0:
-                return self.encontrarTamanioFuncionClase(clase, listaAux[1].replace("(", ""))
+                return self.encontrarClasePadreEra(clase, listaAux[1].replace("(", ""))
 
     def encontrarParametrosFuncionClase(self, padre, funcion):
         while True:
@@ -1638,8 +1638,16 @@ class misterParser ( Parser ):
         self.quadList[falso][3] = cont
 
     def crearCuadruploEra(self, nombreFuncion):
-        tamAux = self.obtenerTamanioFuncion(nombreFuncion)
-        self.quadList.append(['ERA',None,None,tamAux])
+        clase = self.obtenerClaseFuncionEra(nombreFuncion)
+        funcion = nombreFuncion
+        nombreFuncion = nombreFuncion.split(".")
+        if len(nombreFuncion) == 1:
+            if nombreFuncion[0].find("(") > 0:
+                funcion = nombreFuncion[0].replace("(", "")
+        elif nombreFuncion[1].find("(") > 0:
+            funcion = nombreFuncion[1].replace("(", "")
+        
+        self.quadList.append(['ERA',None,clase,funcion])
 
     def guardarCuadruploParam(self, referencia, numParam):
         elementoLlamada = self.pilaO[len(self.pilaO) - 1]
