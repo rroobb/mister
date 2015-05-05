@@ -67,6 +67,18 @@ class maquinaVirtual:
 				indexs[2] = direccion - 6000
 				return indexs
 
+	def obtenerTamanioFuncion(self):
+		if type(self.cuadruplos[self.InstruccionIndex][3]) is list:
+			return
+		tamanio = None
+		clase = self.cuadruplos[self.InstruccionIndex][2]
+		funcion = self.cuadruplos[self.InstruccionIndex][3]
+		if clase != None:
+			self.cuadruplos[self.InstruccionIndex][3] = self.dirPrincipal[clase][1][funcion][5]
+		else:
+			self.cuadruplos[self.InstruccionIndex][3] = self.dirPrincipal[funcion][7]
+
+
 	def operacionBasica(self, op:str):
 		aux1 = 0
 		aux2 = 0
@@ -218,6 +230,7 @@ class maquinaVirtual:
 
 	def era(self):
 		self.stackPorReferenciaFunciones.append([])
+		self.obtenerTamanioFuncion()
 		aux = self.cuadruplos[self.InstruccionIndex][3]
 		self.stackCantidadEspacio.append(aux)
 		self.memoria[1][0] = self.memoria[1][0] + ([0] * aux[0])
