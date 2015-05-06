@@ -47,18 +47,15 @@ FUNCION ENTERO INICIO (ENTERO parametro1 , DECIMAL parametro2) {
 	ASIGNAR num1 = print("hola" + " jeje", &num2 , num3, &p);
 	IMPRIMIR(num2);
 	ASIGNAR rob.lista.num1 = print("hola", &num2 , num3, &p);
-	SI (num1 < num2){
-		SI (num2 > num1) {
+	SI ( 0){
+		SI ( 0) {
 			IMPRIMIR("si");
 		}
 	}
 	SINO{
 		IMPRIMIR("no");
 	}
-	MIENTRAS (num1 < 0 ){
-		IMPRIMIR(num1);
-		ASIGNAR num1 = num1 + 1;
-	}
+
 	RETORNAR 0;
 
 }

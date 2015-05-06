@@ -203,8 +203,19 @@ class maquinaVirtual:
 	# se le asigna al program counter el indice del cuadruplo que se quierea ejecutar
 
 	def gotof(self):
-		indexs = self.obtenerDireccion(self.cuadruplos[self.InstruccionIndex][1])
-		if self.memoria[indexs[0]][indexs[1]][indexs[2]] == 0:
+		aux1 = None
+		if type(self.cuadruplos[self.InstruccionIndex][1]) is int:
+			indexs = self.obtenerDireccion(self.cuadruplos[self.InstruccionIndex][1])
+			aux1 = self.memoria[indexs[0]][indexs[1]][indexs[2]]
+
+		elif type(self.cuadruplos[self.InstruccionIndex][1]) is list:
+			aux1 = self.cuadruplos[self.InstruccionIndex][1][0]
+			if type(aux1) is list:
+				indexs = self.obtenerDireccion(aux1[0])
+				aux1 = self.memoria[indexs[0]][indexs[1]][indexs[2]]
+				indexs = self.obtenerDireccion(aux1)
+				aux1 = self.memoria[indexs[0]][indexs[1]][indexs[2]]	
+		if aux1 == 0:
 			self.InstruccionIndex = self.cuadruplos[self.InstruccionIndex][3] - 1
 
 	# se le asigna un valor a una direccion de memoria especifica
