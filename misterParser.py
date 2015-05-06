@@ -551,6 +551,8 @@ class misterParser ( Parser ):
             if isinstance( listener, misterListener ):
                 listener.exitPrograma(self)
 
+    #inserta una funcion de clase o global al directorio principal
+
     def insertarFunc(self):
         self.funcionActual = self.getCurrentToken().text
         if self.dirPrincipal.get(self.funcionActual) != None:
@@ -564,6 +566,8 @@ class misterParser ( Parser ):
             self.dirPrincipal[self.claseActual][1][self.funcionActual] = [self.AuxTipo, {}, [0,0,0,0], [], None, [0,0,0]]
         self.AuxTipo = None
 
+    #inserta una clase al directorio principal
+
     def insertarClase(self):
         if self.dirPrincipal.get(self.claseActual) != None:
             print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Clase ya existente" )
@@ -572,6 +576,8 @@ class misterParser ( Parser ):
             return
         self.dirPrincipal[self.claseActual] = [None, {}, self.AuxPadre, {}, None, None, None, [0,0,0]]
 
+    # inserta los atributos de los padres a una instancia de una clase
+
     def insertarAtributosPadre(self):
         atribsPadre = {}
         if self.AuxPadre != None:
@@ -579,6 +585,8 @@ class misterParser ( Parser ):
             for key in atribsPadre.keys():
                 self.dirPrincipal[self.claseActual][3][key] = atribsPadre[key]
         self.AuxPadre = None
+
+    #valida que cuando se encuentra un indice, lo anterior sea una lista
 
     def validarAsignarLista(self):
         self.tipoListaAux = self.pTipos[len(self.pTipos)- 1]
@@ -589,6 +597,8 @@ class misterParser ( Parser ):
             sys.exit()
             return
         self.contCteL = 0
+
+    # valida que el tipo de un elemento corresponda al de la lista
     
     def validarElementoCteLista(self):
         if self.pTipos[len(self.pTipos)- 1] != self.tipoListaAux[1]:
@@ -598,6 +608,8 @@ class misterParser ( Parser ):
             return
         self.contCteL = self.contCteL + 1
 
+    # valida que la longitud de la lista asignada a otra sea menor o igual
+
     def validarLongitudLista(self):
         if int(self.contCteL) > int(self.tipoListaAux[2]):
             print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " La longitud de la lista es menor al numero de elementos declarados" )
@@ -605,6 +617,8 @@ class misterParser ( Parser ):
             sys.exit()
             return
         self.tipoListaAux = None
+
+    # genera cuadruplos de asignacion para cada elemento, cuando se asigna una lista con otra
 
     def asignarLista(self):
         stackAuxElementos = []
@@ -626,6 +640,8 @@ class misterParser ( Parser ):
 
         self.pOper.pop()
         self.pOper.pop()
+
+    # inserta los atributos de una clase, como variables locales dentro de una funcion
 
     def insertarAtributosFuncionClase(self):
         if self.claseActual != None and self.funcionActual != None:
@@ -655,7 +671,8 @@ class misterParser ( Parser ):
                         direccionAux = self.memLocalTexto
                         self.memLocalTexto = self.memLocalTexto + int(dirTipoLista[2]) - 1
                 self.dirPrincipal[self.claseActual][1][self.funcionActual][1][key] = [dictAux[key][0],None,direccionAux,{}]
-            
+   
+   #inserta una variable al lugar correspondiente dentro del directorio principal, con todos sus metadatos 
 
     def insertarVariable(self):
         direccion = None
@@ -819,10 +836,14 @@ class misterParser ( Parser ):
                 self.dirPrincipal[self.claseActual][1][self.funcionActual][1][self.variableActual] = [tipo, self.AuxVisVar, direccion, dicAtributos]
         self.variableActual = None
 
+    #resetea las direcciones a su valor incial
+
     def resetDireccionLocal(self):
         self.memLocalEntero = 8999
         self.memLocalDecimal = 14999
         self.memLocalTexto = 20999
+
+    # checa que el id de una variable exista
 
     def checarId(self, variableId):
         if self.claseActual == None:
@@ -847,6 +868,8 @@ class misterParser ( Parser ):
                         self._syntaxErrors = self._syntaxErrors + 1
                         sys.exit()
                         return
+
+    #valida que al atributo en una clase exista, o que se pueda acceder de forma publica
 
     def checarAtributo(self, atributoId):
         varAtributos = None
@@ -915,6 +938,8 @@ class misterParser ( Parser ):
                     sys.exit()
                     return
 
+    # valida que una funcion exista
+
     def checarMetodo(self):
         if self.semanticaCompuestoAux2 == None:
             if self.claseActual == None:
@@ -970,6 +995,8 @@ class misterParser ( Parser ):
                     
             self.encontrarFuncionClase(tipo)
 
+    #busca una funcion dentro de una clase, y de sus padres tambien
+
     def encontrarFuncionClase(self, padre):
         if padre in ['ENTERO','DECIMAL','TEXTO','NADA', 'LISTA']:
             print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " No se puede acceder al metodo" )
@@ -990,6 +1017,8 @@ class misterParser ( Parser ):
         sys.exit()
         return
 
+        #regresa el tipo de retorno de una funcion
+
     def encontrarTipoFuncionClase(self, padre, funcion):
         while True:
             dictAux = self.dirPrincipal[padre][1]
@@ -1001,6 +1030,8 @@ class misterParser ( Parser ):
                 break
         return
 
+    #valida que lo que se intente imprimir en consola sea ["ENTERO", "DECIMAL", "TEXTO", "LISTA"]
+
     def validarElementoEscritura(self):
         aux = self.pTipos[len(self.pTipos)-1]
         aux = aux.split(",")
@@ -1009,11 +1040,15 @@ class misterParser ( Parser ):
             self._syntaxErrors = self._syntaxErrors + 1
             sys.exit()
 
+    #valida que lo que se intente leer de consola sea ["ENTERO", "DECIMAL", "TEXTO"]
+
     def validarElementoLectura(self, tipo:str):
         if tipo not in ["ENTERO", "DECIMAL", "TEXTO"]:
             print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " No se puede leer el tipo de variable" )
             self._syntaxErrors = self._syntaxErrors + 1
             sys.exit()
+
+    #encuentra el tipo de atributo de una clase
 
     def encontrarTipoAtributoClase(self, padre, atributo):
         while True:
@@ -1025,6 +1060,8 @@ class misterParser ( Parser ):
             if padre == None:
                 break
         return
+
+    # obtiene el tipo de cualquier variable
 
     def obtenerTipo(self, stringVariable):
         if stringVariable == None :
@@ -1095,6 +1132,8 @@ class misterParser ( Parser ):
             else:
                 return self.encontrarTipoAtributoClase(clase, listaAux[1])
 
+    # encuentra la direccion de una funcion de una clase
+
     def encontrarDireccionFuncionClase(self, padre, funcion):
         while True:
             dictAux = self.dirPrincipal[padre][1]
@@ -1105,6 +1144,8 @@ class misterParser ( Parser ):
             if padre == None:
                 break
         return
+
+    # obtiene la direccion de una funcion que no es de clase
 
     def obtenerDireccionFuncion(self, stringFuncion):
         if stringFuncion == None:
@@ -1140,6 +1181,8 @@ class misterParser ( Parser ):
 
             if listaAux[1].find("(") > 0:
                 return self.encontrarDireccionFuncionClase(clase, listaAux[1].replace("(", ""))
+
+    # obtiene la direccion de una variable
 
     def obtenerDireccionVariable(self, stringVariable):
         if stringVariable == None:
@@ -1244,6 +1287,8 @@ class misterParser ( Parser ):
                         else:    
                             return self.dirPrincipal[self.claseActual][1][self.funcionActual][1][listaAux[0]][3][listaAux[1]][2]
 
+    # encuentra el padre de una clase
+
     def encontrarClasePadreEra(self, padre, funcion):
         while True:
             dictAux = self.dirPrincipal[padre][1]
@@ -1254,6 +1299,8 @@ class misterParser ( Parser ):
             if padre == None:
                 break
         return
+
+    # obtiene el nombre de la clase de acuerdo a un nombre de una funcion
 
     def obtenerClaseFuncionEra(self, stringFuncion):
         if stringFuncion == None:
@@ -1290,6 +1337,8 @@ class misterParser ( Parser ):
             if listaAux[1].find("(") > 0:
                 return self.encontrarClasePadreEra(clase, listaAux[1].replace("(", ""))
 
+    # obtiene los parametros de una funcion de una clase dada
+
     def encontrarParametrosFuncionClase(self, padre, funcion):
         while True:
             dictAux = self.dirPrincipal[padre][1]
@@ -1300,6 +1349,8 @@ class misterParser ( Parser ):
             if padre == None:
                 break
         return
+
+    # obtiene los parametros de una funcion 
 
     def obtenerParametros(self, stringVariable):
         if stringVariable == None :
@@ -1335,6 +1386,8 @@ class misterParser ( Parser ):
             if listaAux[1].find("(") > 0:
                 return self.encontrarParametrosFuncionClase(clase, listaAux[1].replace("(", ""))
 
+    # obtiene la direccion de un paramentro de una funcion en una clase
+
     def encontrarDirParametroFuncionClase(self, padre, funcion, numParam):
         while True:
             dictAux = self.dirPrincipal[padre][1]
@@ -1345,6 +1398,8 @@ class misterParser ( Parser ):
             if padre == None:
                 break
         return
+
+    # obtiene el tipo de direccion de un parametro de acuerdo a su posicion en la lista de parametro
 
     def obtenerTipoDireccionParametro(self, stringVariable, numParam):
         if stringVariable == None :
@@ -1380,6 +1435,8 @@ class misterParser ( Parser ):
 
             if listaAux[1].find("(") > 0:
                 return self.encontrarDirParametroFuncionClase(clase, listaAux[1].replace("(", ""), numParam)
+
+    # obtiene la direccion de un paramentro de una funcion
 
     def obtenerDireccionParametro(self, tipoDireccion):
         offset = 0
@@ -1417,12 +1474,15 @@ class misterParser ( Parser ):
 
         return -1
 
+    #valida que una clase exista
+
     def checarClase(self):
         if self.dirPrincipal.get(self.AuxTipoVar) == None:
             print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Clase no declarada" )
             self._syntaxErrors = self._syntaxErrors + 1
             sys.exit()
-            return
+
+    #agrega el parametro a una funcion, le suma a sus contadores de recursos
 
     def agregarParametro(self, tipo):
         if self.claseActual ==  None:
@@ -1454,16 +1514,18 @@ class misterParser ( Parser ):
                 dic[3].append(tipo+','+self.AuxTipoLista+','+self.AuxTamanioLista)
                 dic[2][3] = dic[2][3] + 1
     
-    def checarParametro(self):
-        variableParametro = self.getCurrentToken().text
-        
+    #inserta el operando y el tipo de este a las pilas correspondientes
+
     def insertarValorTipo(self,op,tipoOp):
         self.pilaO.append(op)
         self.pTipos.append(tipoOp)
 
+    #inserta el operando a la pila
+
     def insertarOperador(self,op):
         self.pOper.append(op)
 
+    #crea cuadruplos de operaciones aritmeticas, logicas y asignacion
     def crearCuadruploExpresion(self,op,tipoCuadruplo):
         #OP = 0 - mult,div 1 - suma,resta 2 - relacionales 3 - logicos 4 - asignacion
         auxDireccion = 0
@@ -1519,6 +1581,8 @@ class misterParser ( Parser ):
             else:
                 self.pOper.append(oper)
 
+    #valida que el tipo de indice  usado en una lista, sea entero
+
     def validarListaConVar(self, tipoId:str, index:str):
         if tipoId == "LISTA":
             self.checarId(index)
@@ -1529,6 +1593,9 @@ class misterParser ( Parser ):
             else:
                 return True
         return False
+
+    # crea el cuadruplo para sumar direcciones cuando la lista tiene un variable entera como indice y crea otro cuadruplo que valida que 
+    # este dentro del rango
 
     def sumarDirsYValidar(self,lista,indice):
         listaDir = self.obtenerDireccionVariable(lista)
@@ -1552,6 +1619,8 @@ class misterParser ( Parser ):
         self.quadList.append(['+',[int(listaDir)],indiceDir,auxDireccion])
         self.insertarValorTipo([[auxDireccion]],res)
         self.quadList.append(['validarIndex',[int(listaTipo[2])],indiceDir,listaDir])
+
+    #valida todo id compuesto y lo inserta a las pilas
 
     def construirValidarCompuesto(self):
         self.checarId(self.semanticaCompuestoAux)
@@ -1623,7 +1692,7 @@ class misterParser ( Parser ):
                 #generar cuadruplo para suma de direcciones y otro para validar INDEX
                 self.sumarDirsYValidar(self.semanticaCompuestoAux + '.' + self.semanticaCompuestoAux2,self.semanticaCompuestoAux3)
 
-
+    # crea el cuadruplo para la funcion IMPRIMIR
 
     def crearCuadruploEscritura(self):
         if self.pilaO:
@@ -1639,8 +1708,12 @@ class misterParser ( Parser ):
                     elemento = elemento + 1
                     tamanio = tamanio - 1
 
+    # crea el cuadruplo para la funcion LEER
+
     def crearCuadruploLectura(self,elemento):
         self.quadList.append(['leer',None,None,elemento])
+
+    # crea el cuadruplo gotof
 
     def crearCuadruploCondicion(self):
         condicion = self.pilaO.pop()
@@ -1655,10 +1728,14 @@ class misterParser ( Parser ):
             cont = len(self.quadList)
             self.pSaltos.append(cont-1)
 
+    #saca elemento de la pila de saltos
+
     def crearCuadruploDecision2(self):
         salida = self.pSaltos.pop()
         cont = len(self.quadList)
         self.quadList[salida][3] = cont
+
+    # crea cuadruplo goto para un if
 
     def crearCuadruploDecision3(self):
         falso = self.pSaltos.pop()
@@ -1667,9 +1744,13 @@ class misterParser ( Parser ):
         self.pSaltos.append(cont-1)
         self.quadList[falso][3] = cont
 
+    # inserta a la pla de saltos
+
     def crearCuadruploCiclo1(self):
         cont = len(self.quadList)
         self.pSaltos.append(cont)
+
+    #crea un cuadruplo goto para un ciclo
 
     def crearCuadruploCiclo3(self):
         falso = self.pSaltos.pop()
@@ -1677,6 +1758,8 @@ class misterParser ( Parser ):
         self.quadList.append(['goto',None,None,retorno])
         cont = len(self.quadList)
         self.quadList[falso][3] = cont
+
+    # crea cuadruplo era
 
     def crearCuadruploEra(self, nombreFuncion):
         clase = self.obtenerClaseFuncionEra(nombreFuncion)
@@ -1689,6 +1772,8 @@ class misterParser ( Parser ):
             funcion = nombreFuncion[1].replace("(", "")
 
         self.quadList.append(['ERA',None,clase,funcion])
+
+    # guarda cuadruplos param para ser insertados posteriormente a la lista de cuadruplos
 
     def guardarCuadruploParam(self, referencia, numParam):
         elementoLlamada = self.pilaO[len(self.pilaO) - 1]
@@ -1707,6 +1792,8 @@ class misterParser ( Parser ):
                 dirParametro = dirParametro + 1
                 elementoLlamada = elementoLlamada + 1
                 tamanioLlamada = tamanioLlamada - 1
+
+    #obtiene los atributos de una variable
 
     def obtenerAtributosVariable(self,stringVariable):
         if stringVariable == None:
@@ -1739,6 +1826,8 @@ class misterParser ( Parser ):
                     if auxiliar != None:
                         return auxiliar[3]
 
+    # encuentra las variables locales de una funcion que pertenece a unca clase
+
     def encontrarAtributosFuncionClase(self, padre, funcion):
         while True:
             dictAux = self.dirPrincipal[padre][1]
@@ -1749,6 +1838,8 @@ class misterParser ( Parser ):
             if padre == None:
                 break
         return
+
+    # encuentra las variables locales de una funcion
 
     def obtenerAtributosFuncion(self, stringFuncion):
         if stringFuncion == None:
@@ -1785,6 +1876,8 @@ class misterParser ( Parser ):
             if listaAux[1].find("(") > 0:
                 return self.encontrarAtributosFuncionClase(clase, listaAux[1].replace("(", ""))
 
+    #crea cuadruplo Param
+
     def crearCuadruploParam(self):
         if self.stackCuadruploParam:
             for x in range(0,self.stackContArgumLlamadaFunc[len(self.stackContArgumLlamadaFunc)-1]):
@@ -1800,15 +1893,21 @@ class misterParser ( Parser ):
                     dirAtributoVariable = atributosVariable[key][2]
                     self.quadList.append(['PARAM',True,dirAtributoFuncion,dirAtributoVariable])
 
+    #crea cuadruplo GOSUB
+
 
     def crearCuadruploGosub(self, nombreFuncion):
         dirAux = self.obtenerDireccionFuncion(nombreFuncion)
         self.quadList.append(['GOSUB',None,None,dirAux])
 
+    #crea curadruplo retornar
+
     def crearCuadruploRetornar(self):
         elemento = self.pilaO.pop()
         tipoElemento = self.pTipos.pop()
         self.quadList.append(['RETORNAR',None,None,elemento])
+
+    #crea curadruplo asignacion retorno
 
     def crearCuadruploAsignacionRetorno(self):
         if self.asignacionRetorno:
@@ -1816,8 +1915,12 @@ class misterParser ( Parser ):
             if elemento != None:
                 self.quadList.append(['asignacionRetorno',None,None,elemento])
 
+    #cre cuadruplo ENDPROC
+
     def crearCuadruploTerminarProc(self):
         self.quadList.append([self.terminacionProc,None,None,None])
+
+    #crea cuadruplo inicial que lleva al main
 
     def crearCuadruploInicial(self):
         self.quadList.append(['goto',None,None,None])
@@ -1825,6 +1928,8 @@ class misterParser ( Parser ):
     def completarCuadruploInicial(self):
         cont = len(self.quadList)
         self.quadList[0][3] = cont
+
+    #asigna la direcion de inicio a una funcion
 
     def asignarDirInicioFuncion(self, nombreFuncion):
         cont = len(self.quadList)
@@ -1834,6 +1939,8 @@ class misterParser ( Parser ):
         else:
             if self.dirPrincipal[self.claseActual][1].get(nombreFuncion):
                 self.dirPrincipal[self.claseActual][1][nombreFuncion][4] = cont
+
+    # asigna la cantidad de recursos de cada tipo que utiliza una funcion
 
     def asignarTamanioFuncion(self):
         contEntero = self.memLocalEntero - 8999
@@ -1845,6 +1952,8 @@ class misterParser ( Parser ):
         else:
             if self.dirPrincipal[self.claseActual][1].get(self.funcionActual):
                 self.dirPrincipal[self.claseActual][1][self.funcionActual][5] = [contEntero,contDecimal,contTexto]
+
+    #checa que la cantidad de parametros y su tipo sea el correspondiente a lo que se declaro en la funcion
 
     def checarOrdenParametros(self):
         if len(self.stackParametros) == 0 or len(self.pTipos) == 0 or len(self.stackContParametros) == 0 :
@@ -1875,6 +1984,8 @@ class misterParser ( Parser ):
         self.pilaO.pop()
         self.pTipos.pop()
 
+    #valida que el tipo de retorno sea el declarado en la funcion
+
     def validarTipoRetorno(self):
         if self.RetornoTipo == "NADA":
             print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " No se espera un valor de retorno" )
@@ -1885,11 +1996,15 @@ class misterParser ( Parser ):
             self._syntaxErrors = self._syntaxErrors + 1
             sys.exit()
 
+    #valida que haya un retorno de valor si el tipo de retorno es diferente a NADA
+
     def validarNoRetorno(self):
         if self.RetornoTipo != "NADA":
             print ("Semantic error: line " + str(self.getCurrentToken().line) + ":" + str(self.getCurrentToken().column) + " Se espera un valor de retorno de tipo " + self.RetornoTipo )
             self._syntaxErrors = self._syntaxErrors + 1
             sys.exit()
+
+    # valida que la cantidad de parametros sea la correcta
 
     def checarLongitudParametros(self):
         if self.stackParametros:

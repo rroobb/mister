@@ -1,6 +1,6 @@
 
 FUNCION ENTERO INICIO () {
-	LISTA ENTERO 10 x = [10,9,8,7,6,5,4,3,2,1];
+	LISTA ENTERO 10 x = [10,9,8,7,4,5,6,3,2,1];
 	ENTERO indice = 0, indice2 = 0, temp;
 
 	MIENTRAS ( indice < 10){
