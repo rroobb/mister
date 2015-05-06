@@ -29,7 +29,7 @@ CLASE persona HEREDA servivo {
 CLASE animal HEREDA servivo {
 	ATRIBUTOS:
 		PUBLICO TEXTO raza;
-	
+		
 	METODOS:
 		FUNCION NADA print() {
 			IMPRIMIR(raza);

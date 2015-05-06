@@ -571,6 +571,13 @@ class misterParser ( Parser ):
             sys.exit()
             return
         self.dirPrincipal[self.claseActual] = [None, {}, self.AuxPadre, {}, None, None, None, [0,0,0]]
+
+    def insertarAtributosPadre(self):
+        atribsPadre = {}
+        if self.AuxPadre != None:
+            atribsPadre = self.dirPrincipal[self.AuxPadre][3]
+            for key in atribsPadre.keys():
+                self.dirPrincipal[self.claseActual][3][key] = atribsPadre[key]
         self.AuxPadre = None
 
     def validarAsignarLista(self):
@@ -5753,6 +5760,7 @@ class misterParser ( Parser ):
             self.classAux1()
             self.state = 484
             self.insertarClase()
+            self.insertarAtributosPadre()
             self.match(misterParser.LLAVE1)
             self.state = 485
             self.classAux2()
